@@ -1,0 +1,42 @@
+{
+  "project": {
+    "name": "egj2025",
+    "language": "go",
+    "framework": "wasm"
+  },
+  "ai": {
+    "provider": "gemini",
+    "language": "japanese",
+    "locale": "ja-JP",
+    "cultural_context": "japan"
+  },
+  "code_review": {
+    "enabled": true,
+    "language": "ja",
+    "style": {
+      "politeness": "high",
+      "formality": "moderate",
+      "tone": "constructive"
+    },
+    "focus": [
+      "可読性の向上",
+      "パフォーマンスの最適化", 
+      "セキュリティの確認",
+      "Go言語のベストプラクティス",
+      "WebAssembly最適化",
+      "エラーハンドリング"
+    ]
+  },
+  "suggestions": {
+    "language": "ja",
+    "include_explanations": true,
+    "provide_examples": true,
+    "reference_docs": true
+  },
+  "communication": {
+    "greeting": "コードレビューを開始します。",
+    "closing": "レビューは以上です。",
+    "encouragement": true,
+    "constructive_feedback": true
+  }
+}

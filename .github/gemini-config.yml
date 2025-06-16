@@ -1,0 +1,54 @@
+gemini:
+  language: "ja"
+  locale: "ja-JP"
+  
+  # プルリクエストレビュー設定
+  pr_review:
+    enabled: true
+    language: "japanese"
+    style: "polite"
+    tone: "constructive"
+    format: "structured"
+    
+    # 日本語レビューテンプレート
+    templates:
+      review_intro: "コードレビューを実施いたします。"
+      review_conclusion: "レビューは以上です。ご確認ください。"
+      approval: "承認いたします。"
+      request_changes: "修正をお願いいたします。"
+    
+    # レビューフォーカスエリア
+    focus_areas:
+      - "コードの可読性"
+      - "パフォーマンス"
+      - "セキュリティ"
+      - "ベストプラクティス"
+      - "バグの可能性"
+      - "テストカバレッジ"
+    
+    # 文化的コンテキスト
+    cultural_context:
+      country: "japan"
+      communication_style: "polite"
+      feedback_approach: "constructive"
+      
+  # トリガー設定
+  triggers:
+    - "@gemini"
+    - "@gemini-ja"
+    - "@ジェミニ"
+    - "@レビュー"
+    
+  # AI設定
+  ai_settings:
+    model: "gemini-pro"
+    temperature: 0.3
+    max_tokens: 2048
+    include_context: true
+    
+  # 除外設定
+  exclude_files:
+    - "*.md"
+    - "*.txt"
+    - "node_modules/**/*"
+    - ".git/**/*"

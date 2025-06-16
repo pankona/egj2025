@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "gemini": {
+    "model": "gemini-1.5-pro",
+    "language": "ja",
+    "locale": "ja-JP",
+    "region": "asia-northeast1"
+  },
+  "code_assist": {
+    "enabled": true,
+    "auto_complete": true,
+    "auto_review": true,
+    "language_preference": "japanese",
+    "communication_style": {
+      "politeness_level": "high",
+      "formality": "business",
+      "tone": "helpful_and_constructive"
+    }
+  },
+  "review_settings": {
+    "default_language": "ja",
+    "review_depth": "detailed",
+    "include_suggestions": true,
+    "include_explanations": true,
+    "focus_areas": [
+      "コードの品質",
+      "パフォーマンス",
+      "セキュリティ",
+      "可読性",
+      "保守性",
+      "Go言語の慣例",
+      "WebAssembly最適化"
+    ],
+    "cultural_adaptations": {
+      "use_honorifics": true,
+      "polite_suggestions": true,
+      "encourage_learning": true
+    }
+  },
+  "pr_integration": {
+    "enabled": true,
+    "auto_trigger": true,
+    "triggers": [
+      "@gemini",
+      "@gemini-ja",
+      "@ジェミニ",
+      "@コードレビュー",
+      "@レビューお願いします"
+    ],
+    "review_template": {
+      "header": "## 📝 コードレビュー結果\n\nGemini Code Assistによるレビューを実施いたします。",
+      "footer": "\n---\n*このレビューはGemini Code Assistにより自動生成されました。*",
+      "sections": [
+        "概要",
+        "良い点",
+        "改善提案",
+        "セキュリティチェック",
+        "パフォーマンス",
+        "その他の気づき"
+      ]
+    }
+  },
+  "japanese_specific": {
+    "use_keigo": true,
+    "business_tone": true,
+    "clear_explanations": true,
+    "helpful_suggestions": true,
+    "encourage_best_practices": true
+  }
+}

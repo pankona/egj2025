@@ -1,0 +1,21 @@
+{
+  "gemini-code-assist.language": "ja",
+  "gemini-code-assist.locale": "ja-JP",
+  "gemini-code-assist.reviewLanguage": "japanese",
+  "gemini-code-assist.culturalContext": "japan",
+  "gemini-code-assist.enableAutoReview": true,
+  "gemini-code-assist.reviewLevel": "detailed",
+  "gemini-code-assist.includeContext": true,
+  "gemini-code-assist.autoSuggest": true,
+  "gemini-code-assist.outputLanguage": "ja",
+  "gemini-code-assist.prompt": {
+    "reviewStyle": "polite",
+    "tone": "constructive",
+    "format": "structured"
+  },
+  "gemini-code-assist.triggers": [
+    "@gemini",
+    "@gemini-ja", 
+    "@ジェミニ"
+  ]
+}
