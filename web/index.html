@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UNION JUMPERS</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+        
+        .control-section {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border-radius: 5px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+        }
+        
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 UNION JUMPERS</h1>
+    
+    <div class="game-container">
+        <div id="loading" class="loading">Loading game...</div>
+        <canvas id="game-canvas" style="display: none;"></canvas>
+    </div>
+    
+    <div class="controls">
+        <div class="control-section">
+            <h3>🎯 Game Objective</h3>
+            <p>Guide both characters to the <span style="color: #ffa500;">yellow goal platform</span> at the same time!</p>
+        </div>
+        
+        <div class="control-section">
+            <h3>🎮 Controls</h3>
+            <p><strong>F key:</strong> Blue character jump</p>
+            <p><strong>J key:</strong> Red character jump</p>
+            <p><strong>SPACE:</strong> Restart when game over/cleared</p>
+        </div>
+        
+        <div class="control-section">
+            <h3>🎲 Game Rules</h3>
+            <p>• Characters move automatically left and right</p>
+            <p>• Use jumps to navigate platforms</p>
+            <p>• Both characters must reach the goal platform to win</p>
+            <p>• Characters stop when fully inside the goal area</p>
+        </div>
+    </div>
+
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        
+        // Show loading message
+        const loading = document.getElementById('loading');
+        const canvas = document.getElementById('game-canvas');
+        
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+            // Hide loading and show canvas
+            loading.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            go.run(result.instance);
+        }).catch((err) => {
+            console.error('Failed to load WASM:', err);
+            loading.textContent = 'Failed to load game. Please refresh the page.';
+            loading.style.color = 'red';
+        });
+    </script>
+</body>
+</html>

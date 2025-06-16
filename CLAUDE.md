@@ -18,3 +18,9 @@
 - `make lint` は `go vet ./...` を実行する
 - 実装完了時には必ず `make test` を実行してテストをチェックする
 - `make test` は `GOOS=windows go test -v ./...` を実行する（WSL環境対応）
+
+## WASMビルドとデプロイメント
+- `make build-wasm` でWebAssembly向けにビルドし、distフォルダに出力
+- `make serve-wasm` でローカル開発サーバーを起動（ポート8080）
+- GitHub Actionsで自動的にGitHub Pagesにデプロイ
+- mainブランチにプッシュすると自動でhttps://pankona.github.io/egj2025/でゲームが公開される
