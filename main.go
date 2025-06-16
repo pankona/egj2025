@@ -211,7 +211,7 @@ func (g *Game) resetGame() {
 func (g *Game) Update() error {
 	switch g.State {
 	case StatePlaying:
-		// Handle input
+		// Handle keyboard input
 		// F key for blue unit jump
 		if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 			g.BlueUnit.jump()
@@ -220,6 +220,19 @@ func (g *Game) Update() error {
 		// J key for red unit jump
 		if inpututil.IsKeyJustPressed(ebiten.KeyJ) {
 			g.RedUnit.jump()
+		}
+
+		// Handle touch input for gameplay
+		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
+		for _, id := range touchIDs {
+			x, _ := ebiten.TouchPosition(id)
+			// Left half of screen = F key (blue unit jump)
+			if x < ScreenWidth/2 {
+				g.BlueUnit.jump()
+			} else {
+				// Right half of screen = J key (red unit jump)
+				g.RedUnit.jump()
+			}
 		}
 
 		// Update physics for both units
@@ -236,6 +249,12 @@ func (g *Game) Update() error {
 	case StateGameOver, StateCleared:
 		// Handle restart with space key
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+			g.resetGame()
+		}
+
+		// Handle touch input for retry - any touch triggers retry
+		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
+		if len(touchIDs) > 0 {
 			g.resetGame()
 		}
 	}
