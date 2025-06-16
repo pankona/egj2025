@@ -1,0 +1,33 @@
+gemini:
+  codeAssist:
+    language: ja
+    reviewLanguage: japanese
+    prReviewLanguage: japanese
+    issueLanguage: japanese
+  triggers:
+    - "@gemini"
+    - "@gemini-ja"
+    - "@ジェミニ"
+  settings:
+    culturalContext: japan
+    outputLanguage: ja
+    locale: ja-JP
+    timezone: Asia/Tokyo
+  features:
+    pullRequestReview:
+      enabled: true
+      language: ja
+      autoReview: false
+      detailedFeedback: true
+    issueAnalysis:
+      enabled: true
+      language: ja
+    codeExplanation:
+      enabled: true
+      language: ja
+      includeContext: true
+  preferences:
+    commentStyle: polite
+    explanationDepth: detailed
+    includeExamples: true
+    culturallyAppropriate: true

@@ -1,0 +1,21 @@
+{
+  "aiCodeAssist.language": "ja",
+  "aiCodeAssist.locale": "ja-JP",
+  "aiCodeAssist.reviewLanguage": "japanese",
+  "aiCodeAssist.commentLanguage": "ja",
+  "gemini.codeAssist.defaultLanguage": "japanese",
+  "gemini.codeAssist.reviewSettings": {
+    "language": "ja",
+    "locale": "ja-JP",
+    "culturalContext": "japan"
+  },
+  "gemini.codeAssist.enabled": true,
+  "gemini.codeAssist.language": "japanese",
+  "gemini.codeAssist.autoReview": true,
+  "gemini.codeAssist.reviewOnSave": true,
+  "gemini.codeAssist.culturalSettings": {
+    "country": "JP",
+    "language": "ja",
+    "timezone": "Asia/Tokyo"
+  }
+}

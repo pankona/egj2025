@@ -1,0 +1,23 @@
+{
+  "gemini": {
+    "codeAssist": {
+      "language": "japanese",
+      "locale": "ja-JP",
+      "reviewSettings": {
+        "outputLanguage": "ja",
+        "commentStyle": "japanese", 
+        "cultureAware": true
+      },
+      "preferences": {
+        "reviewLanguage": "japanese",
+        "suggestionLanguage": "japanese",
+        "explanationLanguage": "japanese"
+      }
+    }
+  },
+  "ai": {
+    "defaultLanguage": "ja",
+    "reviewLanguage": "japanese",
+    "locale": "ja-JP"
+  }
+}

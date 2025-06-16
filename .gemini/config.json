@@ -1,0 +1,38 @@
+{
+  "codeAssist": {
+    "language": "japanese",
+    "locale": "ja-JP",
+    "enabled": true,
+    "features": {
+      "codeReview": {
+        "enabled": true,
+        "language": "ja",
+        "outputStyle": "japanese"
+      },
+      "suggestions": {
+        "enabled": true,
+        "language": "ja"
+      },
+      "explanations": {
+        "enabled": true,
+        "language": "ja"
+      },
+      "autoComplete": {
+        "enabled": true,
+        "commentLanguage": "ja"
+      }
+    },
+    "culturalSettings": {
+      "country": "JP",
+      "timezone": "Asia/Tokyo",
+      "dateFormat": "YYYY/MM/DD",
+      "context": "japan"
+    },
+    "reviewPreferences": {
+      "outputLanguage": "japanese",
+      "detailLevel": "detailed",
+      "includeExplanations": true,
+      "culturallyAppropriate": true
+    }
+  }
+}
