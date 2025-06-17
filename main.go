@@ -24,6 +24,15 @@ const (
 
 	// Unit constants
 	UnitSize = 20
+
+	// UI constants
+	StageTextX = 10
+	StageTextY = 30
+)
+
+var (
+	// UI colors
+	WhiteColor = color.RGBA{255, 255, 255, 255}
 )
 
 type GameState int
@@ -212,6 +221,17 @@ func (g *Game) resetGame() {
 	g.State = StatePlaying
 }
 
+func (g *Game) advanceToNextStageOrRestart() {
+	if g.StageLoader.NextStage() {
+		// Advanced to next stage, reset game with new stage
+		g.resetGame()
+	} else {
+		// No more stages, restart from stage 1
+		g.StageLoader.ResetToFirstStage()
+		g.resetGame()
+	}
+}
+
 func (g *Game) Update() error {
 	switch g.State {
 	case StatePlaying:
@@ -265,27 +285,13 @@ func (g *Game) Update() error {
 	case StateCleared:
 		// Handle next stage with space key
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-			if g.StageLoader.NextStage() {
-				// Advanced to next stage, reset game with new stage
-				g.resetGame()
-			} else {
-				// No more stages, restart from stage 1
-				g.StageLoader.ResetToFirstStage()
-				g.resetGame()
-			}
+			g.advanceToNextStageOrRestart()
 		}
 
 		// Handle touch input for next stage - any touch advances
 		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
 		if len(touchIDs) > 0 {
-			if g.StageLoader.NextStage() {
-				// Advanced to next stage, reset game with new stage
-				g.resetGame()
-			} else {
-				// No more stages, restart from stage 1
-				g.StageLoader.ResetToFirstStage()
-				g.resetGame()
-			}
+			g.advanceToNextStageOrRestart()
 		}
 	}
 
@@ -313,8 +319,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.State == StatePlaying {
 		stageText := fmt.Sprintf("Stage %d", g.StageLoader.CurrentStageIndex)
 		op := &text.DrawOptions{}
-		op.GeoM.Translate(10, 30)
-		op.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+		op.GeoM.Translate(StageTextX, StageTextY)
+		op.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, stageText, g.Font, op)
 	}
 
@@ -327,13 +333,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		// Draw first line
 		op1 := &text.DrawOptions{}
 		op1.GeoM.Translate(float64(ScreenWidth/2-80), float64(ScreenHeight/2-30))
-		op1.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+		op1.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, "GAME OVER", g.Font, op1)
 		
 		// Draw second line
 		op2 := &text.DrawOptions{}
 		op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
-		op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+		op2.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, "Press SPACE to retry", g.Font, op2)
 
 	case StateCleared:
@@ -343,18 +349,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		// Draw first line
 		op1 := &text.DrawOptions{}
 		op1.GeoM.Translate(float64(ScreenWidth/2-100), float64(ScreenHeight/2-30))
-		op1.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+		op1.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, "STAGE CLEARED!", g.Font, op1)
 		
 		// Draw second line
 		op2 := &text.DrawOptions{}
 		if g.StageLoader.CurrentStageIndex < g.StageLoader.TotalStages {
 			op2.GeoM.Translate(float64(ScreenWidth/2-140), float64(ScreenHeight/2+10))
-			op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+			op2.ColorScale.ScaleWithColor(WhiteColor)
 			text.Draw(screen, "Press SPACE for next stage", g.Font, op2)
 		} else {
 			op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
-			op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+			op2.ColorScale.ScaleWithColor(WhiteColor)
 			text.Draw(screen, "Press SPACE to restart", g.Font, op2)
 		}
 	}

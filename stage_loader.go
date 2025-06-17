@@ -12,11 +12,15 @@ type StageLoader struct {
 func NewStageLoader() *StageLoader {
 	return &StageLoader{
 		CurrentStageIndex: 1, // Start from stage 1
-		TotalStages:       10,
+		// NOTE: TotalStages is hardcoded and must be updated manually when adding stages
+		// TODO: Consider dynamic stage counting for better scalability
+		TotalStages: 10,
 	}
 }
 
 // LoadStage loads the stage by index
+// NOTE: Using switch statement for stage loading. For better scalability with many stages,
+// consider using a map[int]func() *Stage approach for dynamic stage registration.
 func (sl *StageLoader) LoadStage(stageIndex int) *Stage {
 	switch stageIndex {
 	case 1:
@@ -75,10 +79,9 @@ func (sl *StageLoader) ResetToFirstStage() {
 
 // Common platform colors and definitions
 var (
-	GroundColor    = color.RGBA{100, 100, 100, 255}  // Gray for ground
-	PlatformColor  = color.RGBA{150, 150, 150, 255}  // Light gray for platforms
-	GoalColor      = color.RGBA{255, 255, 0, 255}    // Yellow for goal platforms
-	SpecialColor   = color.RGBA{100, 255, 100, 255}  // Green for special platforms
+	GroundColor   = color.RGBA{100, 100, 100, 255} // Gray for ground
+	PlatformColor = color.RGBA{150, 150, 150, 255} // Light gray for platforms
+	GoalColor     = color.RGBA{255, 255, 0, 255}   // Yellow for goal platforms
 )
 
 // Helper functions for common platform types
