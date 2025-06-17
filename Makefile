@@ -15,5 +15,12 @@ build-wasm:
 serve-wasm: build-wasm
 	go run github.com/hajimehoshi/wasmserve@latest -http=:8080 .
 
+yamlfmt: yamlfmt-install
+	yamlfmt .
+
+yamlfmt-install:
+	go install github.com/google/yamlfmt/cmd/yamlfmt@latest
+
+
 clean:
 	rm -rf dist
