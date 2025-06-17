@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ゲーム名: UNION JUMPERS
 - 説明: Ebitengineを使用した2Dプラットフォームゲーム
 - ディレクトリ: /home/pankona/go/src/github.com/pankona/egj2025
-- Go バージョン: 1.23.10
+- Go バージョン: 1.24.4
 - メインライブラリ: github.com/hajimehoshi/ebiten/v2
 
 ## 開発コマンド
