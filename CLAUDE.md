@@ -43,6 +43,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発ワークフロー
 - 実装完了時には必ず `make lint` を実行してコード品質をチェックする
 - 実装完了時には必ず `make test` を実行してテストをチェックする
+- 実装完了時には必ず `make fmt` を実行してフォーマットを整える
 - WASMビルドのテストは `make serve-wasm` でローカル確認
 
 ## メモリ管理ガイドライン
