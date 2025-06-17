@@ -9,7 +9,7 @@ test:
 build-wasm:
 	mkdir -p dist
 	GOOS=js GOARCH=wasm go build -o dist/main.wasm .
-	cp $$(go env GOROOT)/misc/wasm/wasm_exec.js dist/
+	cp $$(go env GOROOT)/lib/wasm/wasm_exec.js dist/
 	cp web/index.html dist/
 
 serve-wasm: build-wasm
