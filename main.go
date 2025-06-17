@@ -120,14 +120,14 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		unitRight := u.X + UnitSize
 		unitTop := u.Y
 		unitBottom := u.Y + UnitSize
-		
+
 		platformLeft := platform.X
 		platformRight := platform.X + platform.Width
 		platformTop := platform.Y
-		
+
 		// Check if unit is horizontally overlapping with platform
 		horizontalOverlap := unitRight > platformLeft && unitLeft < platformRight
-		
+
 		// Landing on top of platform (falling down) - skip goal platforms
 		if !platform.IsGoal && horizontalOverlap && u.VY > 0 && unitBottom > platformTop && unitTop < platformTop {
 			u.Y = platformTop - UnitSize
@@ -142,7 +142,7 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		u.OnGround = true
 		u.VY = 0
 	}
-	
+
 	// Check if unit is completely inside goal platform area (for stopping and clearing)
 	if u.OnGround {
 		for _, platform := range stage.Platforms {
@@ -155,7 +155,7 @@ func (u *Unit) updatePhysics(stage *Stage) {
 				platformRight := platform.X + platform.Width
 				platformTop := platform.Y
 				platformBottom := platform.Y + platform.Height
-				
+
 				// Check if unit is completely inside the goal platform
 				if unitLeft >= platformLeft && unitRight <= platformRight &&
 					unitTop >= platformTop && unitBottom <= platformBottom {
@@ -329,13 +329,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case StateGameOver:
 		// Draw semi-transparent background
 		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
-		
+
 		// Draw first line
 		op1 := &text.DrawOptions{}
 		op1.GeoM.Translate(float64(ScreenWidth/2-80), float64(ScreenHeight/2-30))
 		op1.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, "GAME OVER", g.Font, op1)
-		
+
 		// Draw second line
 		op2 := &text.DrawOptions{}
 		op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
@@ -345,13 +345,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case StateCleared:
 		// Draw semi-transparent background
 		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
-		
+
 		// Draw first line
 		op1 := &text.DrawOptions{}
 		op1.GeoM.Translate(float64(ScreenWidth/2-100), float64(ScreenHeight/2-30))
 		op1.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, "STAGE CLEARED!", g.Font, op1)
-		
+
 		// Draw second line
 		op2 := &text.DrawOptions{}
 		if g.StageLoader.CurrentStageIndex < g.StageLoader.TotalStages {
