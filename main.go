@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"image/color"
 	"log"
 
@@ -53,11 +54,12 @@ type Stage struct {
 }
 
 type Game struct {
-	BlueUnit *Unit
-	RedUnit  *Unit
-	Stage    *Stage
-	State    GameState
-	Font     *text.GoTextFace
+	BlueUnit    *Unit
+	RedUnit     *Unit
+	Stage       *Stage
+	State       GameState
+	Font        *text.GoTextFace
+	StageLoader *StageLoader
 }
 
 func (u *Unit) checkCollisionWithPlatform(platform Platform) bool {
@@ -205,6 +207,8 @@ func (g *Game) resetGame() {
 	g.RedUnit.OnGround = false
 	g.RedUnit.Stopped = false
 
+	// Reload current stage
+	g.Stage = g.StageLoader.GetCurrentStage()
 	g.State = StatePlaying
 }
 
@@ -246,7 +250,7 @@ func (g *Game) Update() error {
 			g.State = StateCleared
 		}
 
-	case StateGameOver, StateCleared:
+	case StateGameOver:
 		// Handle restart with space key
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			g.resetGame()
@@ -256,6 +260,32 @@ func (g *Game) Update() error {
 		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
 		if len(touchIDs) > 0 {
 			g.resetGame()
+		}
+
+	case StateCleared:
+		// Handle next stage with space key
+		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+			if g.StageLoader.NextStage() {
+				// Advanced to next stage, reset game with new stage
+				g.resetGame()
+			} else {
+				// No more stages, restart from stage 1
+				g.StageLoader.ResetToFirstStage()
+				g.resetGame()
+			}
+		}
+
+		// Handle touch input for next stage - any touch advances
+		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
+		if len(touchIDs) > 0 {
+			if g.StageLoader.NextStage() {
+				// Advanced to next stage, reset game with new stage
+				g.resetGame()
+			} else {
+				// No more stages, restart from stage 1
+				g.StageLoader.ResetToFirstStage()
+				g.resetGame()
+			}
 		}
 	}
 
@@ -278,6 +308,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw red unit
 	vector.DrawFilledRect(screen, float32(g.RedUnit.X), float32(g.RedUnit.Y), UnitSize, UnitSize, g.RedUnit.Color, false)
+
+	// Draw stage number in top-left corner during gameplay
+	if g.State == StatePlaying {
+		stageText := fmt.Sprintf("Stage %d", g.StageLoader.CurrentStageIndex)
+		op := &text.DrawOptions{}
+		op.GeoM.Translate(10, 30)
+		op.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+		text.Draw(screen, stageText, g.Font, op)
+	}
 
 	// Draw game state text with background
 	switch g.State {
@@ -309,9 +348,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		
 		// Draw second line
 		op2 := &text.DrawOptions{}
-		op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
-		op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
-		text.Draw(screen, "Press SPACE to retry", g.Font, op2)
+		if g.StageLoader.CurrentStageIndex < g.StageLoader.TotalStages {
+			op2.GeoM.Translate(float64(ScreenWidth/2-140), float64(ScreenHeight/2+10))
+			op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+			text.Draw(screen, "Press SPACE for next stage", g.Font, op2)
+		} else {
+			op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
+			op2.ColorScale.ScaleWithColor(color.RGBA{255, 255, 255, 255})
+			text.Draw(screen, "Press SPACE to restart", g.Font, op2)
+		}
 	}
 }
 
@@ -334,6 +379,9 @@ func main() {
 		Size:   24,
 	}
 
+	// Create stage loader
+	stageLoader := NewStageLoader()
+
 	game := &Game{
 		BlueUnit: &Unit{
 			X:         100,
@@ -355,21 +403,10 @@ func main() {
 			OnGround:  false,
 			Stopped:   false,
 		},
-		Stage: &Stage{
-			Platforms: []Platform{
-				// Ground platform
-				{X: 0, Y: float64(ScreenHeight - 50), Width: float64(ScreenWidth), Height: 50, Color: color.RGBA{100, 100, 100, 255}, IsGoal: false},
-				// Some platforms for testing
-				{X: 200, Y: 400, Width: 150, Height: 20, Color: color.RGBA{150, 150, 150, 255}, IsGoal: false},
-				{X: 450, Y: 300, Width: 150, Height: 20, Color: color.RGBA{150, 150, 150, 255}, IsGoal: false},
-				{X: 100, Y: 200, Width: 100, Height: 20, Color: color.RGBA{150, 150, 150, 255}, IsGoal: false},
-				{X: 550, Y: 200, Width: 100, Height: 20, Color: color.RGBA{150, 150, 150, 255}, IsGoal: false},
-				// Goal platform (at the bottom center)
-				{X: 350, Y: float64(ScreenHeight - 70), Width: 100, Height: 20, Color: color.RGBA{255, 255, 0, 255}, IsGoal: true},
-			},
-		},
-		State: StatePlaying,
-		Font:  font,
+		Stage:       stageLoader.GetCurrentStage(), // Load first stage
+		State:       StatePlaying,
+		Font:        font,
+		StageLoader: stageLoader,
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
