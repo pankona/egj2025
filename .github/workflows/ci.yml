@@ -1,0 +1,49 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod download
+      - name: Build project
+        run: make build-wasm
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DISPLAY: ':99.0'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev xvfb
+      - name: Run lint
+        run: make lint
+      - name: Check format
+        run: |
+          make fmt
+          if ! git diff --quiet; then
+            echo "Format check failed. Please run 'make fmt' and commit the changes."
+            git diff
+            exit 1
+          fi
+      - name: Run tests
+        run: |-
+          touch ~/.Xauthority
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          xauth add :99 . $(mcookie)
+          make test

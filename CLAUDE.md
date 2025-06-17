@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ゲーム名: UNION JUMPERS
 - 説明: Ebitengineを使用した2Dプラットフォームゲーム
 - ディレクトリ: /home/pankona/go/src/github.com/pankona/egj2025
-- Go バージョン: 1.23.10
+- Go バージョン: 1.24.4
 - メインライブラリ: github.com/hajimehoshi/ebiten/v2
 
 ## 開発コマンド
@@ -43,6 +43,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発ワークフロー
 - 実装完了時には必ず `make lint` を実行してコード品質をチェックする
 - 実装完了時には必ず `make test` を実行してテストをチェックする
+- 実装完了時には必ず `make fmt` を実行してフォーマットを整える
 - WASMビルドのテストは `make serve-wasm` でローカル確認
 
 ## メモリ管理ガイドライン
