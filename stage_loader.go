@@ -117,3 +117,36 @@ func CreateGoalPlatform(x, y, width, height float64) Platform {
 		IsGoal: true,
 	}
 }
+
+// Grid-based helper functions for platform creation
+
+// CreateGridGroundPlatform creates a ground platform using grid coordinates
+// Default: full width, 2.5 cells high at bottom
+func CreateGridGroundPlatform() Platform {
+	gridPlatform := GridPlatform{
+		Position: GridPosition{X: 0, Y: GridHeight - 3}, // 3 cells from bottom (2.5 rounded up)
+		Size:     GridSize{Width: GridWidth, Height: 3},
+		IsGoal:   false,
+	}
+	return GridPlatformToPlatform(gridPlatform, GroundColor)
+}
+
+// CreateGridPlatform creates a platform using grid coordinates
+func CreateGridPlatform(x, y, width, height int) Platform {
+	gridPlatform := GridPlatform{
+		Position: GridPosition{X: x, Y: y},
+		Size:     GridSize{Width: width, Height: height},
+		IsGoal:   false,
+	}
+	return GridPlatformToPlatform(gridPlatform, PlatformColor)
+}
+
+// CreateGridGoalPlatform creates a goal platform using grid coordinates
+func CreateGridGoalPlatform(x, y, width, height int) Platform {
+	gridPlatform := GridPlatform{
+		Position: GridPosition{X: x, Y: y},
+		Size:     GridSize{Width: width, Height: height},
+		IsGoal:   true,
+	}
+	return GridPlatformToPlatform(gridPlatform, GoalColor)
+}
