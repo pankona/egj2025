@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -33,6 +34,9 @@ const (
 	// UI constants
 	StageTextX = 10
 	StageTextY = 30
+
+	// Audio constants
+	SampleRate = 44100
 )
 
 var (
@@ -84,13 +88,44 @@ type Stage struct {
 	Platforms []Platform
 }
 
+type SoundManager struct {
+	audioContext *audio.Context
+	// jumpSoundBytes []byte // Placeholder for jump sound data
+}
+
+func NewSoundManager() *SoundManager {
+	audioContext := audio.NewContext(SampleRate)
+	return &SoundManager{
+		audioContext: audioContext,
+		// jumpSoundBytes: nil, // Will be loaded from audio file in the future
+	}
+}
+
+func (sm *SoundManager) PlayJumpSound() {
+	// TODO: Implement jump sound playback
+	// This is a placeholder implementation
+	// In the future, this will load and play an actual audio file
+	/*
+		if sm.jumpSoundBytes != nil {
+			jumpSound := bytes.NewReader(sm.jumpSoundBytes)
+			player, err := audio.NewPlayer(sm.audioContext, jumpSound)
+			if err != nil {
+				log.Printf("Failed to create jump sound player: %v", err)
+				return
+			}
+			player.Play()
+		}
+	*/
+}
+
 type Game struct {
-	BlueUnit    *Unit
-	RedUnit     *Unit
-	Stage       *Stage
-	State       GameState
-	Font        *text.GoTextFace
-	StageLoader *StageLoader
+	BlueUnit     *Unit
+	RedUnit      *Unit
+	Stage        *Stage
+	State        GameState
+	Font         *text.GoTextFace
+	StageLoader  *StageLoader
+	SoundManager *SoundManager
 }
 
 // Grid coordinate conversion functions
@@ -228,10 +263,11 @@ func (u *Unit) updatePhysics(stage *Stage) {
 	}
 }
 
-func (u *Unit) jump() {
+func (u *Unit) jump(soundManager *SoundManager) {
 	if u.OnGround {
 		u.VY = -JUMP_STRENGTH
 		u.OnGround = false
+		soundManager.PlayJumpSound()
 	}
 }
 
@@ -299,12 +335,12 @@ func (g *Game) Update() error {
 		// Handle keyboard input
 		// F key for blue unit jump
 		if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-			g.BlueUnit.jump()
+			g.BlueUnit.jump(g.SoundManager)
 		}
 
 		// J key for red unit jump
 		if inpututil.IsKeyJustPressed(ebiten.KeyJ) {
-			g.RedUnit.jump()
+			g.RedUnit.jump(g.SoundManager)
 		}
 
 		// Handle touch input for gameplay
@@ -313,10 +349,10 @@ func (g *Game) Update() error {
 			x, _ := ebiten.TouchPosition(id)
 			// Left half of screen = F key (blue unit jump)
 			if x < ScreenWidth/2 {
-				g.BlueUnit.jump()
+				g.BlueUnit.jump(g.SoundManager)
 			} else {
 				// Right half of screen = J key (red unit jump)
-				g.RedUnit.jump()
+				g.RedUnit.jump(g.SoundManager)
 			}
 		}
 
@@ -449,6 +485,9 @@ func main() {
 	// Create stage loader
 	stageLoader := NewStageLoader()
 
+	// Create sound manager
+	soundManager := NewSoundManager()
+
 	game := &Game{
 		BlueUnit: &Unit{
 			X:         100,
@@ -470,10 +509,11 @@ func main() {
 			OnGround:  false,
 			Stopped:   false,
 		},
-		Stage:       stageLoader.GetCurrentStage(), // Load first stage
-		State:       StatePlaying,
-		Font:        font,
-		StageLoader: stageLoader,
+		Stage:        stageLoader.GetCurrentStage(), // Load first stage
+		State:        StatePlaying,
+		Font:         font,
+		StageLoader:  stageLoader,
+		SoundManager: soundManager,
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
