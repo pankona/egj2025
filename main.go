@@ -25,6 +25,11 @@ const (
 	// Unit constants
 	UnitSize = 20
 
+	// Grid system constants
+	CellSize   = 20                      // Each grid cell is 20x20 pixels (same as UnitSize)
+	GridWidth  = ScreenWidth / CellSize  // 40 cells wide
+	GridHeight = ScreenHeight / CellSize // 30 cells high
+
 	// UI constants
 	StageTextX = 10
 	StageTextY = 30
@@ -58,6 +63,23 @@ type Platform struct {
 	IsGoal              bool // Mark this platform as a goal zone
 }
 
+// GridPosition represents a position in the grid coordinate system
+type GridPosition struct {
+	X, Y int
+}
+
+// GridSize represents the size in grid coordinates
+type GridSize struct {
+	Width, Height int
+}
+
+// GridPlatform represents a platform in grid coordinates
+type GridPlatform struct {
+	Position GridPosition
+	Size     GridSize
+	IsGoal   bool
+}
+
 type Stage struct {
 	Platforms []Platform
 }
@@ -69,6 +91,45 @@ type Game struct {
 	State       GameState
 	Font        *text.GoTextFace
 	StageLoader *StageLoader
+}
+
+// Grid coordinate conversion functions
+
+// GridToPixelX converts grid X coordinate to pixel X coordinate
+func GridToPixelX(gridX int) float64 {
+	return float64(gridX * CellSize)
+}
+
+// GridToPixelY converts grid Y coordinate to pixel Y coordinate
+func GridToPixelY(gridY int) float64 {
+	return float64(gridY * CellSize)
+}
+
+// GridToPixelSize converts grid size to pixel size
+func GridToPixelSize(gridSize int) float64 {
+	return float64(gridSize * CellSize)
+}
+
+// PixelToGridX converts pixel X coordinate to grid X coordinate
+func PixelToGridX(pixelX float64) int {
+	return int(pixelX / CellSize)
+}
+
+// PixelToGridY converts pixel Y coordinate to grid Y coordinate
+func PixelToGridY(pixelY float64) int {
+	return int(pixelY / CellSize)
+}
+
+// GridPlatformToPlatform converts a GridPlatform to a Platform with pixel coordinates
+func GridPlatformToPlatform(gridPlatform GridPlatform, color color.Color) Platform {
+	return Platform{
+		X:      GridToPixelX(gridPlatform.Position.X),
+		Y:      GridToPixelY(gridPlatform.Position.Y),
+		Width:  GridToPixelSize(gridPlatform.Size.Width),
+		Height: GridToPixelSize(gridPlatform.Size.Height),
+		Color:  color,
+		IsGoal: gridPlatform.IsGoal,
+	}
 }
 
 func (u *Unit) checkCollisionWithPlatform(platform Platform) bool {
