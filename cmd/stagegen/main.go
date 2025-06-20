@@ -64,6 +64,8 @@ func parseASCIIArt(filename string) (*StageData, error) {
 		numStr := strings.TrimPrefix(strings.TrimSuffix(baseName, ".txt"), "stage")
 		if num, err := strconv.Atoi(numStr); err == nil {
 			stageNum = num
+		} else if numStr != "" {
+			log.Printf("警告: ファイル名 '%s' からステージ番号を抽出できませんでした。デフォルトの1を使用します。", baseName)
 		}
 	}
 
@@ -117,6 +119,8 @@ func parseASCIIArt(filename string) (*StageData, error) {
 				processed[y][x] = true
 			case '.':
 				processed[y][x] = true
+			default:
+				return nil, fmt.Errorf("不明な文字 '%c' が座標 (%d, %d) で見つかりました", char, x, y)
 			}
 		}
 	}

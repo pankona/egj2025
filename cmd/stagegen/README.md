@@ -37,6 +37,7 @@ OOOOOOOOOO
 - `stageN.go` ファイルが生成されます
 - `LoadStageN()` 関数とキャラクター開始位置を返す `GetStageNStartPositions()` 関数が含まれます
 - グリッド座標系（40x30セル、20px/セル）を使用します
+- 生成されるコードには常に `CreateGridGroundPlatform()` が含まれ、ASCIIアートで定義したプラットフォームが追加されます
 
 ## 生成されるコードの例
 
