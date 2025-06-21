@@ -95,7 +95,7 @@ type SoundManager struct {
 
 func NewSoundManager() *SoundManager {
 	audioContext := audio.NewContext(SampleRate)
-	
+
 	// TODO: Initialize jump sound player when audio file is available
 	// Example of how to initialize when audio file is loaded:
 	// jumpSound := bytes.NewReader(jumpSoundBytes)
@@ -104,7 +104,7 @@ func NewSoundManager() *SoundManager {
 	//     log.Printf("Failed to create jump sound player: %v", err)
 	//     jumpPlayer = nil
 	// }
-	
+
 	return &SoundManager{
 		audioContext: audioContext,
 		jumpPlayer:   nil, // Will be initialized when audio file is loaded
