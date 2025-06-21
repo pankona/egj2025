@@ -90,32 +90,36 @@ type Stage struct {
 
 type SoundManager struct {
 	audioContext *audio.Context
-	// jumpSoundBytes []byte // Placeholder for jump sound data
+	jumpPlayer   *audio.Player // Audio player for jump sound, reused for better performance
 }
 
 func NewSoundManager() *SoundManager {
 	audioContext := audio.NewContext(SampleRate)
+	
+	// TODO: Initialize jump sound player when audio file is available
+	// Example of how to initialize when audio file is loaded:
+	// jumpSound := bytes.NewReader(jumpSoundBytes)
+	// jumpPlayer, err := audio.NewPlayer(audioContext, jumpSound)
+	// if err != nil {
+	//     log.Printf("Failed to create jump sound player: %v", err)
+	//     jumpPlayer = nil
+	// }
+	
 	return &SoundManager{
 		audioContext: audioContext,
-		// jumpSoundBytes: nil, // Will be loaded from audio file in the future
+		jumpPlayer:   nil, // Will be initialized when audio file is loaded
 	}
 }
 
 func (sm *SoundManager) PlayJumpSound() {
-	// TODO: Implement jump sound playback
-	// This is a placeholder implementation
-	// In the future, this will load and play an actual audio file
-	/*
-		if sm.jumpSoundBytes != nil {
-			jumpSound := bytes.NewReader(sm.jumpSoundBytes)
-			player, err := audio.NewPlayer(sm.audioContext, jumpSound)
-			if err != nil {
-				log.Printf("Failed to create jump sound player: %v", err)
-				return
-			}
-			player.Play()
-		}
-	*/
+	// Use reusable audio player for better performance
+	// This avoids creating a new player each time, which was the previous inefficient approach
+	if sm.jumpPlayer != nil && !sm.jumpPlayer.IsPlaying() {
+		sm.jumpPlayer.Rewind()
+		sm.jumpPlayer.Play()
+	}
+	// TODO: When audio file is available, the jumpPlayer will be initialized in NewSoundManager
+	// and this method will work with actual jump sound effects
 }
 
 type Game struct {
