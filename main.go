@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"image/color"
 	"io"
@@ -15,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/hajimehoshi/go-mp3"
 )
 
 const (
@@ -106,16 +108,63 @@ func NewBGMManager() *BGMManager {
 	}
 }
 
-// LoadBGM loads BGM from a WAV data stream
-func (bgm *BGMManager) LoadBGM(wavData []byte) error {
-	// Stop current BGM if playing
-	bgm.Stop()
+// detectAudioFormat detects the audio format based on file header
+func detectAudioFormat(data []byte) string {
+	if len(data) < 4 {
+		return ""
+	}
 
-	// Create audio stream from WAV data
-	wavStream := bytes.NewReader(wavData)
-	decodedStream, err := wav.DecodeWithSampleRate(bgm.audioContext.SampleRate(), wavStream)
-	if err != nil {
-		return fmt.Errorf("failed to decode WAV: %w", err)
+	// Check for WAV format (RIFF header)
+	if bytes.HasPrefix(data, []byte("RIFF")) && len(data) >= 12 && bytes.Equal(data[8:12], []byte("WAVE")) {
+		return "wav"
+	}
+
+	// Check for MP3 format (ID3 header or MP3 frame sync)
+	if bytes.HasPrefix(data, []byte("ID3")) {
+		return "mp3"
+	}
+
+	// Check for MP3 frame sync (0xFF followed by 0xFB, 0xFA, or 0xF3, 0xF2)
+	if len(data) >= 2 && data[0] == 0xFF && (data[1]&0xE0) == 0xE0 {
+		return "mp3"
+	}
+
+	return ""
+}
+
+// LoadBGM loads BGM from audio data (supports WAV and MP3)
+func (bgm *BGMManager) LoadBGM(audioData []byte) error {
+	// Stop and close the current player if it exists
+	if bgm.player != nil {
+		bgm.player.Close()
+		bgm.player = nil
+	}
+	bgm.isPlaying = false
+	bgm.isPaused = false
+
+	// Detect audio format
+	format := detectAudioFormat(audioData)
+
+	var decodedStream io.ReadSeeker
+	var err error
+
+	switch format {
+	case "wav":
+		// Create audio stream from WAV data
+		wavStream := bytes.NewReader(audioData)
+		decodedStream, err = wav.DecodeWithSampleRate(bgm.audioContext.SampleRate(), wavStream)
+		if err != nil {
+			return fmt.Errorf("failed to decode WAV: %w", err)
+		}
+	case "mp3":
+		// Create audio stream from MP3 data
+		mp3Stream := bytes.NewReader(audioData)
+		decodedStream, err = mp3.DecodeWithSampleRate(bgm.audioContext.SampleRate(), mp3Stream)
+		if err != nil {
+			return fmt.Errorf("failed to decode MP3: %w", err)
+		}
+	default:
+		return fmt.Errorf("unsupported audio format")
 	}
 
 	// Create infinite loop stream
@@ -167,11 +216,6 @@ func (bgm *BGMManager) Stop() {
 		bgm.isPlaying = false
 		bgm.isPaused = false
 	}
-}
-
-// Resume resumes the BGM playback from pause
-func (bgm *BGMManager) Resume() {
-	bgm.Play()
 }
 
 // SetVolume sets the BGM volume (0.0 to 1.0)
@@ -434,7 +478,7 @@ func (g *Game) PauseBGM() {
 // ResumeBGM resumes the background music
 func (g *Game) ResumeBGM() {
 	if g.BGM != nil {
-		g.BGM.Resume()
+		g.BGM.Play()
 	}
 }
 
@@ -445,10 +489,10 @@ func (g *Game) SetBGMVolume(volume float64) {
 	}
 }
 
-// LoadBGMFromData loads BGM from WAV data
-func (g *Game) LoadBGMFromData(wavData []byte) error {
+// LoadBGMFromData loads BGM from audio data (supports WAV and MP3)
+func (g *Game) LoadBGMFromData(audioData []byte) error {
 	if g.BGM != nil {
-		return g.BGM.LoadBGM(wavData)
+		return g.BGM.LoadBGM(audioData)
 	}
 	return fmt.Errorf("BGM manager not initialized")
 }
@@ -642,86 +686,49 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 // generateSampleBGM creates a simple synthetic BGM for testing purposes
 // This generates a simple sine wave pattern as a demonstration
 func generateSampleBGM() []byte {
-	// Create a simple WAV header + data for demonstration
-	// This is a minimal implementation for testing
-	sampleRate := 44100
-	duration := 2      // 2 seconds
-	frequency := 440.0 // A4 note
+	// Create a simple synthetic BGM for testing purposes using encoding/binary for clarity.
+	const (
+		sampleRate    = 44100
+		durationSecs  = 2
+		frequency     = 440.0 // A4 note
+		numChannels   = 1     // mono
+		bitsPerSample = 16    // 16-bit
+	)
 
-	// Calculate number of samples
-	numSamples := sampleRate * duration
+	numSamples := sampleRate * durationSecs
+	dataSize := uint32(numSamples * numChannels * bitsPerSample / 8)
+	byteRate := uint32(sampleRate * numChannels * bitsPerSample / 8)
+	blockAlign := uint16(numChannels * bitsPerSample / 8)
 
-	// Create WAV header (44 bytes)
-	header := make([]byte, 44)
+	buf := new(bytes.Buffer)
 
-	// "RIFF" chunk descriptor
-	copy(header[0:4], "RIFF")
-	// File size - 8 bytes (will be updated)
-	header[4] = byte((36 + numSamples*2) & 0xff)
-	header[5] = byte(((36 + numSamples*2) >> 8) & 0xff)
-	header[6] = byte(((36 + numSamples*2) >> 16) & 0xff)
-	header[7] = byte(((36 + numSamples*2) >> 24) & 0xff)
-	// "WAVE" format
-	copy(header[8:12], "WAVE")
+	// RIFF chunk descriptor
+	buf.WriteString("RIFF")
+	binary.Write(buf, binary.LittleEndian, uint32(36+dataSize))
+	buf.WriteString("WAVE")
 
 	// "fmt " sub-chunk
-	copy(header[12:16], "fmt ")
-	// Sub-chunk size (16 for PCM)
-	header[16] = 16
-	header[17] = 0
-	header[18] = 0
-	header[19] = 0
-	// Audio format (1 for PCM)
-	header[20] = 1
-	header[21] = 0
-	// Number of channels (1 for mono)
-	header[22] = 1
-	header[23] = 0
-	// Sample rate
-	header[24] = byte(sampleRate & 0xff)
-	header[25] = byte((sampleRate >> 8) & 0xff)
-	header[26] = byte((sampleRate >> 16) & 0xff)
-	header[27] = byte((sampleRate >> 24) & 0xff)
-	// Byte rate (sample rate * channels * bits per sample / 8)
-	byteRate := sampleRate * 1 * 16 / 8
-	header[28] = byte(byteRate & 0xff)
-	header[29] = byte((byteRate >> 8) & 0xff)
-	header[30] = byte((byteRate >> 16) & 0xff)
-	header[31] = byte((byteRate >> 24) & 0xff)
-	// Block align (channels * bits per sample / 8)
-	header[32] = 2
-	header[33] = 0
-	// Bits per sample
-	header[34] = 16
-	header[35] = 0
+	buf.WriteString("fmt ")
+	binary.Write(buf, binary.LittleEndian, uint32(16)) // Sub-chunk size for PCM
+	binary.Write(buf, binary.LittleEndian, uint16(1))  // Audio format (PCM)
+	binary.Write(buf, binary.LittleEndian, uint16(numChannels))
+	binary.Write(buf, binary.LittleEndian, uint32(sampleRate))
+	binary.Write(buf, binary.LittleEndian, byteRate)
+	binary.Write(buf, binary.LittleEndian, blockAlign)
+	binary.Write(buf, binary.LittleEndian, uint16(bitsPerSample))
 
 	// "data" sub-chunk
-	copy(header[36:40], "data")
-	// Sub-chunk size (number of samples * channels * bits per sample / 8)
-	dataSize := numSamples * 2
-	header[40] = byte(dataSize & 0xff)
-	header[41] = byte((dataSize >> 8) & 0xff)
-	header[42] = byte((dataSize >> 16) & 0xff)
-	header[43] = byte((dataSize >> 24) & 0xff)
+	buf.WriteString("data")
+	binary.Write(buf, binary.LittleEndian, dataSize)
 
 	// Generate audio data (simple sine wave)
-	data := make([]byte, numSamples*2) // 16-bit samples
 	for i := 0; i < numSamples; i++ {
-		// Generate sine wave sample
 		t := float64(i) / float64(sampleRate)
 		sample := int16(32767 * 0.1 * math.Sin(2*math.Pi*frequency*t)) // Low volume
-
-		// Convert to little-endian bytes
-		data[i*2] = byte(sample & 0xff)
-		data[i*2+1] = byte((sample >> 8) & 0xff)
+		binary.Write(buf, binary.LittleEndian, sample)
 	}
 
-	// Combine header and data
-	result := make([]byte, len(header)+len(data))
-	copy(result, header)
-	copy(result[len(header):], data)
-
-	return result
+	return buf.Bytes()
 }
 
 func main() {
@@ -744,6 +751,7 @@ func main() {
 
 	// Create BGM manager
 	bgmManager := NewBGMManager()
+	defer bgmManager.Close()
 
 	// Load sample BGM for demonstration
 	sampleBGMData := generateSampleBGM()
