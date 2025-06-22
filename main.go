@@ -2,12 +2,16 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"image/color"
+	"io"
 	"log"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -122,6 +126,176 @@ func (sm *SoundManager) PlayJumpSound() {
 	// and this method will work with actual jump sound effects
 }
 
+type BGMManager struct {
+	audioContext *audio.Context
+	player       *audio.Player
+	isPlaying    bool
+	isPaused     bool
+}
+
+func NewBGMManager() *BGMManager {
+	return &BGMManager{
+		audioContext: audio.NewContext(SampleRate),
+		player:       nil,
+		isPlaying:    false,
+		isPaused:     false,
+	}
+}
+
+func (bgm *BGMManager) LoadBGM(data []byte) error {
+	// Close existing player if any
+	if bgm.player != nil {
+		bgm.player.Close()
+		bgm.player = nil
+		bgm.isPlaying = false
+		bgm.isPaused = false
+	}
+
+	// Auto-detect format and decode
+	var stream io.ReadSeeker
+	var err error
+
+	// Try WAV format first (check for RIFF header)
+	if len(data) >= 12 && string(data[0:4]) == "RIFF" && string(data[8:12]) == "WAVE" {
+		stream, err = wav.DecodeWithoutResampling(bytes.NewReader(data))
+		if err != nil {
+			return fmt.Errorf("failed to decode WAV: %v", err)
+		}
+	} else {
+		// If not WAV, generate a simple test sound for now
+		// In the future, MP3 support can be added here with go-mp3
+		stream = bytes.NewReader(bgm.generateTestSound())
+	}
+
+	// Create infinite loop for BGM
+	length, err := stream.Seek(0, io.SeekEnd)
+	if err != nil {
+		return fmt.Errorf("failed to get stream length: %v", err)
+	}
+	loopStream := audio.NewInfiniteLoop(stream, length)
+
+	// Create player
+	bgm.player, err = bgm.audioContext.NewPlayer(loopStream)
+	if err != nil {
+		return fmt.Errorf("failed to create BGM player: %v", err)
+	}
+
+	// Set default volume
+	bgm.player.SetVolume(0.3)
+
+	return nil
+}
+
+func (bgm *BGMManager) generateTestSound() []byte {
+	// Generate a simple sine wave test sound (2 seconds, 440Hz)
+	const (
+		sampleRate = SampleRate
+		duration   = 2 // seconds
+		frequency  = 440.0
+		amplitude  = 0.3
+	)
+
+	samples := sampleRate * duration
+	data := make([]byte, samples*4) // 16-bit stereo = 4 bytes per sample
+
+	for i := 0; i < samples; i++ {
+		// Generate sine wave
+		t := float64(i) / float64(sampleRate)
+		value := math.Sin(2 * math.Pi * frequency * t) * amplitude
+		sample := int16(value * 32767)
+
+		// Write stereo samples (left and right channels)
+		binary.LittleEndian.PutUint16(data[i*4:], uint16(sample))
+		binary.LittleEndian.PutUint16(data[i*4+2:], uint16(sample))
+	}
+
+	// Create WAV header
+	header := bgm.createWAVHeader(len(data))
+	return append(header, data...)
+}
+
+func (bgm *BGMManager) createWAVHeader(dataSize int) []byte {
+	header := make([]byte, 44)
+
+	// RIFF header
+	copy(header[0:4], "RIFF")
+	binary.LittleEndian.PutUint32(header[4:8], uint32(36+dataSize))
+	copy(header[8:12], "WAVE")
+
+	// fmt chunk
+	copy(header[12:16], "fmt ")
+	binary.LittleEndian.PutUint32(header[16:20], 16)      // Chunk size
+	binary.LittleEndian.PutUint16(header[20:22], 1)       // Audio format (PCM)
+	binary.LittleEndian.PutUint16(header[22:24], 2)       // Number of channels (stereo)
+	binary.LittleEndian.PutUint32(header[24:28], SampleRate) // Sample rate
+	binary.LittleEndian.PutUint32(header[28:32], SampleRate*4) // Byte rate
+	binary.LittleEndian.PutUint16(header[32:34], 4)       // Block align
+	binary.LittleEndian.PutUint16(header[34:36], 16)      // Bits per sample
+
+	// data chunk
+	copy(header[36:40], "data")
+	binary.LittleEndian.PutUint32(header[40:44], uint32(dataSize))
+
+	return header
+}
+
+func (bgm *BGMManager) Play() {
+	if bgm.player != nil {
+		if bgm.isPaused {
+			// Resume from pause
+			bgm.player.Play()
+			bgm.isPlaying = true
+			bgm.isPaused = false
+		} else if !bgm.isPlaying {
+			// Start from beginning
+			bgm.player.Rewind()
+			bgm.player.Play()
+			bgm.isPlaying = true
+			bgm.isPaused = false
+		}
+	}
+}
+
+func (bgm *BGMManager) Pause() {
+	if bgm.player != nil && bgm.isPlaying {
+		bgm.player.Pause()
+		bgm.isPlaying = false
+		bgm.isPaused = true
+	}
+}
+
+func (bgm *BGMManager) Stop() {
+	if bgm.player != nil {
+		bgm.player.Pause()
+		bgm.player.Rewind()
+		bgm.isPlaying = false
+		bgm.isPaused = false
+	}
+}
+
+func (bgm *BGMManager) SetVolume(volume float64) {
+	if bgm.player != nil {
+		bgm.player.SetVolume(volume)
+	}
+}
+
+func (bgm *BGMManager) IsPlaying() bool {
+	return bgm.isPlaying
+}
+
+func (bgm *BGMManager) IsPaused() bool {
+	return bgm.isPaused
+}
+
+func (bgm *BGMManager) Close() {
+	if bgm.player != nil {
+		bgm.player.Close()
+		bgm.player = nil
+		bgm.isPlaying = false
+		bgm.isPaused = false
+	}
+}
+
 type Game struct {
 	BlueUnit     *Unit
 	RedUnit      *Unit
@@ -130,6 +304,7 @@ type Game struct {
 	Font         *text.GoTextFace
 	StageLoader  *StageLoader
 	SoundManager *SoundManager
+	BGM          *BGMManager
 }
 
 // Grid coordinate conversion functions
@@ -333,6 +508,38 @@ func (g *Game) advanceToNextStageOrRestart() {
 	}
 }
 
+// BGM control methods
+func (g *Game) StartBGM() {
+	if g.BGM != nil {
+		g.BGM.Play()
+	}
+}
+
+func (g *Game) StopBGM() {
+	if g.BGM != nil {
+		g.BGM.Stop()
+	}
+}
+
+func (g *Game) PauseBGM() {
+	if g.BGM != nil {
+		g.BGM.Pause()
+	}
+}
+
+func (g *Game) ResumeBGM() {
+	if g.BGM != nil {
+		g.BGM.Play()
+	}
+}
+
+func (g *Game) LoadBGMFromData(data []byte) error {
+	if g.BGM != nil {
+		return g.BGM.LoadBGM(data)
+	}
+	return fmt.Errorf("BGM manager not initialized")
+}
+
 func (g *Game) Update() error {
 	switch g.State {
 	case StatePlaying:
@@ -345,6 +552,17 @@ func (g *Game) Update() error {
 		// J key for red unit jump
 		if inpututil.IsKeyJustPressed(ebiten.KeyJ) {
 			g.RedUnit.jump(g.SoundManager)
+		}
+
+		// BGM control keys
+		if inpututil.IsKeyJustPressed(ebiten.KeyM) {
+			g.StartBGM() // Play/Resume BGM
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyN) {
+			g.PauseBGM() // Pause BGM
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyB) {
+			g.StopBGM() // Stop BGM
 		}
 
 		// Handle touch input for gameplay
@@ -423,6 +641,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(StageTextX, StageTextY)
 		op.ColorScale.ScaleWithColor(WhiteColor)
 		text.Draw(screen, stageText, g.Font, op)
+
+		// Draw BGM status in top-right corner
+		if g.BGM != nil {
+			var bgmStatus string
+			if g.BGM.IsPlaying() {
+				bgmStatus = "BGM: Playing"
+			} else if g.BGM.IsPaused() {
+				bgmStatus = "BGM: Paused"
+			} else {
+				bgmStatus = "BGM: Stopped"
+			}
+			
+			bgmOp := &text.DrawOptions{}
+			bgmOp.GeoM.Translate(float64(ScreenWidth-150), StageTextY)
+			bgmOp.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, bgmStatus, g.Font, bgmOp)
+		}
+
+		// Draw BGM control hints at bottom
+		controlHints := "BGM: M=Play/Resume, N=Pause, B=Stop"
+		hintOp := &text.DrawOptions{}
+		hintOp.GeoM.Translate(10, float64(ScreenHeight-30))
+		hintOp.ColorScale.ScaleWithColor(color.RGBA{200, 200, 200, 255})
+		text.Draw(screen, controlHints, g.Font, hintOp)
 	}
 
 	// Draw game state text with background
@@ -492,6 +734,14 @@ func main() {
 	// Create sound manager
 	soundManager := NewSoundManager()
 
+	// Create BGM manager
+	bgmManager := NewBGMManager()
+
+	// Load sample BGM (auto-generated test sound)
+	if err := bgmManager.LoadBGM(nil); err != nil {
+		log.Printf("Failed to load sample BGM: %v", err)
+	}
+
 	game := &Game{
 		BlueUnit: &Unit{
 			X:         100,
@@ -518,7 +768,11 @@ func main() {
 		Font:         font,
 		StageLoader:  stageLoader,
 		SoundManager: soundManager,
+		BGM:          bgmManager,
 	}
+
+	// Ensure BGM resources are properly cleaned up
+	defer bgmManager.Close()
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
