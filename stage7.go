@@ -1,52 +1,39 @@
 package main
 
-// LoadStage7 creates stage 7 - Asymmetric: Master challenge
-// This stage is the most complex asymmetric stage before character swapping begins
+// LoadStage7 creates stage 7 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage7() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Left side (Blue) - maze-like path
-			CreatePlatform(50, 480, 70, 15),
-			CreatePlatform(160, 450, 40, 15),
-			CreatePlatform(80, 410, 60, 15),
-			CreatePlatform(180, 380, 50, 15),
-			CreatePlatform(120, 340, 45, 15),
-			CreatePlatform(200, 300, 55, 15),
-			CreatePlatform(140, 260, 50, 15),
-			CreatePlatform(220, 220, 45, 15),
-			CreatePlatform(160, 180, 60, 15),
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// Right side (Red) - vertical challenge path
-			CreatePlatform(650, 480, 100, 15),
-			CreatePlatform(700, 440, 50, 15),
-			CreatePlatform(620, 400, 60, 15),
-			CreatePlatform(680, 360, 45, 15),
-			CreatePlatform(600, 320, 70, 15),
-			CreatePlatform(660, 280, 50, 15),
-			CreatePlatform(580, 240, 60, 15),
-			CreatePlatform(640, 200, 55, 15),
-			CreatePlatform(570, 160, 80, 15),
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			// Central obstacle course
-			CreatePlatform(280, 400, 30, 15),
-			CreatePlatform(340, 380, 25, 15),
-			CreatePlatform(300, 340, 35, 15),
-			CreatePlatform(360, 320, 30, 15),
-			CreatePlatform(320, 280, 40, 15),
-			CreatePlatform(380, 260, 35, 15),
-			CreatePlatform(340, 220, 30, 15),
-			CreatePlatform(400, 200, 40, 15),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Final platforms before goal
-			CreatePlatform(280, 140, 50, 15),
-			CreatePlatform(370, 120, 60, 15),
-			CreatePlatform(470, 140, 50, 15),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			// Single central goal requiring perfect coordination
-			CreateGoalPlatform(385, 80, 50, 20),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
+
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
+
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage7StartPositions returns the starting positions for stage 7
+func GetStage7StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }

@@ -1,40 +1,39 @@
 package main
 
-// LoadStage5 creates stage 5 - Asymmetric: Complex different paths
-// This stage features more complex asymmetric design with challenging coordination
+// LoadStage5 creates stage 5 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage5() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Left side (Blue) - complex zigzag path
-			CreatePlatform(80, 480, 60, 15),
-			CreatePlatform(200, 440, 50, 15),
-			CreatePlatform(120, 380, 70, 15),
-			CreatePlatform(250, 340, 60, 15),
-			CreatePlatform(160, 280, 80, 15),
-			CreatePlatform(280, 220, 50, 15),
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// Right side (Red) - stepped descent path
-			CreatePlatform(620, 470, 100, 15),
-			CreatePlatform(580, 420, 80, 15),
-			CreatePlatform(640, 370, 60, 15),
-			CreatePlatform(560, 320, 90, 15),
-			CreatePlatform(600, 270, 70, 15),
-			CreatePlatform(540, 200, 80, 15),
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			// Central challenge area
-			CreatePlatform(350, 300, 50, 15),
-			CreatePlatform(420, 260, 40, 15),
-			CreatePlatform(380, 200, 60, 15),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Final convergence
-			CreatePlatform(340, 160, 40, 15),
-			CreatePlatform(420, 160, 40, 15),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			// Goal platform - single target requiring coordination
-			CreateGoalPlatform(370, 120, 60, 20),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
+
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
+
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage5StartPositions returns the starting positions for stage 5
+func GetStage5StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }

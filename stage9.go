@@ -1,54 +1,39 @@
 package main
 
-// LoadStage9 creates stage 9 - Character Swap: Complex role reversal
-// This stage features multiple character swaps and complex asymmetric design
+// LoadStage9 creates stage 9 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage9() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Complex starting area with immediate role confusion
-			CreatePlatform(400, 480, 80, 15), // Central start
-			CreatePlatform(200, 460, 60, 15), // Left option
-			CreatePlatform(600, 460, 60, 15), // Right option
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// First swap area - characters must take opposite paths
-			CreatePlatform(120, 420, 50, 15),
-			CreatePlatform(680, 420, 50, 15),
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			CreatePlatform(180, 380, 40, 15),
-			CreatePlatform(620, 380, 40, 15),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Central maze section
-			CreatePlatform(280, 360, 30, 15),
-			CreatePlatform(520, 360, 30, 15),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			CreatePlatform(320, 320, 35, 15),
-			CreatePlatform(480, 320, 35, 15),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
 
-			CreatePlatform(260, 280, 40, 15),
-			CreatePlatform(540, 280, 40, 15),
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
 
-			// Second swap area - more complex crossing
-			CreatePlatform(360, 240, 25, 15),
-			CreatePlatform(440, 240, 25, 15),
-			CreatePlatform(400, 220, 30, 15),
-
-			// Asymmetric final approach
-			CreatePlatform(180, 200, 80, 15),
-			CreatePlatform(580, 180, 60, 15),
-
-			CreatePlatform(100, 160, 50, 15),
-			CreatePlatform(650, 140, 70, 15),
-
-			CreatePlatform(200, 120, 40, 15),
-			CreatePlatform(560, 100, 45, 15),
-
-			// Multiple goals requiring strategic positioning
-			CreateGoalPlatform(50, 80, 40, 15),  // Far left
-			CreateGoalPlatform(380, 60, 40, 15), // Center
-			CreateGoalPlatform(710, 80, 40, 15), // Far right
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage9StartPositions returns the starting positions for stage 9
+func GetStage9StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }

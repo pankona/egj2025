@@ -1,7 +1,7 @@
-.PHONY: lint test build-wasm serve-wasm clean
+.PHONY: lint test build-wasm serve-wasm clean generate-stages
 
 lint:
-	go vet ./...
+	GOOS=js GOARCH=wasm go vet ./...
 
 test:
 	go test -v ./...
@@ -22,6 +22,21 @@ install-tools:
 fmt: install-tools
 	yamlfmt .
 	goimports -w .
+
+generate-stages:
+	@echo "Generating stage files from ASCII art..."
+	@for i in 01 02 03 04 05 06 07 08 09 10; do \
+		if [ -f stage$$i.txt ]; then \
+			echo "Generating stage$$i.go from stage$$i.txt"; \
+			go run cmd/stagegen/main.go stage$$i.txt; \
+			if [ -f stage$$i.go ]; then \
+				mv stage$$i.go stage$$(echo $$i | sed 's/^0*//').go; \
+			fi; \
+		else \
+			echo "Warning: stage$$i.txt not found"; \
+		fi; \
+	done
+	@echo "Stage generation complete"
 
 clean:
 	rm -rf dist
