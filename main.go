@@ -159,7 +159,7 @@ func (bgm *BGMManager) LoadBGM(audioData []byte) error {
 	case "mp3":
 		// Create audio stream from MP3 data
 		mp3Stream := bytes.NewReader(audioData)
-		decodedStream, err = mp3.DecodeWithSampleRate(bgm.audioContext.SampleRate(), mp3Stream)
+		decodedStream, err = mp3.Decode(bgm.audioContext, mp3Stream)
 		if err != nil {
 			return fmt.Errorf("failed to decode MP3: %w", err)
 		}
