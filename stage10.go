@@ -1,62 +1,39 @@
 package main
 
-// LoadStage10 creates stage 10 - Final Challenge: Ultimate coordination test
-// This is the final stage with maximum complexity, character swapping, and asymmetric design
+// LoadStage10 creates stage 10 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage10() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Starting challenge - immediate decision required
-			CreatePlatform(100, 480, 50, 15),
-			CreatePlatform(375, 480, 50, 15),
-			CreatePlatform(650, 480, 50, 15),
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// Triple path beginning
-			CreatePlatform(50, 440, 40, 15),  // Far left
-			CreatePlatform(380, 440, 40, 15), // Center
-			CreatePlatform(700, 440, 40, 15), // Far right
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			// Complex weaving section
-			CreatePlatform(120, 400, 30, 15),
-			CreatePlatform(200, 380, 25, 15),
-			CreatePlatform(280, 360, 35, 15),
-			CreatePlatform(360, 340, 30, 15),
-			CreatePlatform(440, 360, 35, 15),
-			CreatePlatform(520, 380, 25, 15),
-			CreatePlatform(600, 400, 30, 15),
-			CreatePlatform(680, 420, 35, 15),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Mid-section with multiple crossing points
-			CreatePlatform(160, 320, 40, 15),
-			CreatePlatform(240, 300, 30, 15),
-			CreatePlatform(320, 280, 35, 15),
-			CreatePlatform(400, 260, 40, 15),
-			CreatePlatform(480, 280, 35, 15),
-			CreatePlatform(560, 300, 30, 15),
-			CreatePlatform(640, 320, 40, 15),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			// Timing-critical section - small platforms
-			CreatePlatform(100, 240, 25, 15),
-			CreatePlatform(180, 220, 20, 15),
-			CreatePlatform(260, 200, 30, 15),
-			CreatePlatform(340, 180, 25, 15),
-			CreatePlatform(420, 160, 35, 15),
-			CreatePlatform(500, 180, 25, 15),
-			CreatePlatform(580, 200, 30, 15),
-			CreatePlatform(660, 220, 20, 15),
-			CreatePlatform(720, 240, 25, 15),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
 
-			// Final convergence - requires perfect coordination
-			CreatePlatform(200, 140, 50, 15),
-			CreatePlatform(300, 120, 40, 15),
-			CreatePlatform(380, 100, 40, 15),
-			CreatePlatform(460, 120, 40, 15),
-			CreatePlatform(550, 140, 50, 15),
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
 
-			// Ultimate challenge - single goal requiring perfect timing
-			CreateGoalPlatform(375, 60, 50, 20),
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage10StartPositions returns the starting positions for stage 10
+func GetStage10StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }

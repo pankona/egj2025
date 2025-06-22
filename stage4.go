@@ -1,35 +1,39 @@
 package main
 
-// LoadStage4 creates stage 4 - Asymmetric: Introduction to different paths
-// This stage starts introducing asymmetric design where each character has different routes
+// LoadStage4 creates stage 4 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage4() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Left side (Blue) - easier path
-			CreatePlatform(50, 450, 100, 20),
-			CreatePlatform(180, 400, 80, 20),
-			CreatePlatform(100, 320, 120, 20),
-			CreatePlatform(250, 260, 90, 20),
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// Right side (Red) - different path
-			CreatePlatform(650, 460, 100, 20),
-			CreatePlatform(580, 380, 70, 20),
-			CreatePlatform(620, 300, 100, 20),
-			CreatePlatform(540, 220, 80, 20),
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			// Central connection areas
-			CreatePlatform(320, 350, 80, 20),
-			CreatePlatform(420, 280, 70, 20),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Shared final approach
-			CreatePlatform(360, 180, 80, 20),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			// Goal platforms - close together for coordination
-			CreateGoalPlatform(340, 140, 50, 15),
-			CreateGoalPlatform(410, 140, 50, 15),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
+
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
+
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage4StartPositions returns the starting positions for stage 4
+func GetStage4StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }

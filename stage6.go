@@ -1,42 +1,39 @@
 package main
 
-// LoadStage6 creates stage 6 - Asymmetric: Timing challenge
-// This stage requires precise timing between the two characters
+// LoadStage6 creates stage 6 - Generated from ASCII art
+// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
 func LoadStage6() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform
-			CreateGroundPlatform(),
+			// Ground platform (full width, 3 cells high at bottom)
+			CreateGridGroundPlatform(),
 
-			// Left side (Blue) - long jumps required
-			CreatePlatform(60, 460, 80, 20),
-			CreatePlatform(220, 400, 60, 15),
-			CreatePlatform(140, 340, 50, 15),
-			CreatePlatform(280, 280, 70, 15),
-			CreatePlatform(180, 220, 60, 15),
+			// Regular platform at (9, 17) size 5x1
+			CreateGridPlatform(9, 17, 5, 1),
 
-			// Right side (Red) - precise small platforms
-			CreatePlatform(660, 470, 80, 15),
-			CreatePlatform(600, 430, 40, 15),
-			CreatePlatform(640, 390, 35, 15),
-			CreatePlatform(580, 350, 45, 15),
-			CreatePlatform(620, 310, 40, 15),
-			CreatePlatform(560, 270, 50, 15),
-			CreatePlatform(600, 230, 45, 15),
+			// Regular platform at (24, 17) size 5x1
+			CreateGridPlatform(24, 17, 5, 1),
 
-			// Central timing platforms
-			CreatePlatform(320, 360, 80, 15),
-			CreatePlatform(440, 320, 60, 15),
-			CreatePlatform(380, 260, 50, 15),
+			// Regular platform at (7, 22) size 5x1
+			CreateGridPlatform(7, 22, 5, 1),
 
-			// Convergence area with timing challenge
-			CreatePlatform(300, 180, 45, 15),
-			CreatePlatform(360, 160, 40, 15),
-			CreatePlatform(420, 180, 45, 15),
+			// Regular platform at (24, 22) size 5x1
+			CreateGridPlatform(24, 22, 5, 1),
 
-			// Dual goal platforms requiring simultaneous arrival
-			CreateGoalPlatform(330, 120, 40, 15),
-			CreateGoalPlatform(430, 120, 40, 15),
+			// Regular platform at (0, 28) size 40x2
+			CreateGridPlatform(0, 28, 40, 2),
+
+			// Goal platform at (4, 26) size 3x1
+			CreateGridGoalPlatform(4, 26, 3, 1),
+
+			// Goal platform at (23, 26) size 3x1
+			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
+}
+
+// GetStage6StartPositions returns the starting positions for stage 6
+func GetStage6StartPositions() (blueX, blueY, redX, redY float64) {
+	// Convert grid coordinates to pixel coordinates
+	return 0, 540, 720, 540
 }
