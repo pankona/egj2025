@@ -5,29 +5,22 @@ package main
 func LoadStage1() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform (full width, 3 cells high at bottom)
-			CreateGridGroundPlatform(),
 
-			// Regular platform at (9, 17) size 5x1
-			CreateGridPlatform(9, 17, 5, 1),
+			// Regular platform at (0, 0) size 40x1
+			CreateGridPlatform(0, 0, 40, 1),
 
-			// Regular platform at (24, 17) size 5x1
-			CreateGridPlatform(24, 17, 5, 1),
+			// Regular platform at (4, 27) size 1x3
+			CreateGridPlatform(4, 27, 1, 3),
 
-			// Regular platform at (7, 22) size 5x1
-			CreateGridPlatform(7, 22, 5, 1),
-
-			// Regular platform at (24, 22) size 5x1
-			CreateGridPlatform(24, 22, 5, 1),
+			// Regular platform at (35, 27) size 1x3
+			CreateGridPlatform(35, 27, 1, 3),
 
 			// Regular platform at (0, 28) size 40x2
 			CreateGridPlatform(0, 28, 40, 2),
 
-			// Goal platform at (4, 26) size 3x1
-			CreateGridGoalPlatform(4, 26, 3, 1),
+			// Goal platform at (19, 27) size 2x1
+			CreateGridGoalPlatform(19, 27, 2, 1),
 
-			// Goal platform at (23, 26) size 3x1
-			CreateGridGoalPlatform(23, 26, 3, 1),
 		},
 	}
 }
@@ -35,5 +28,5 @@ func LoadStage1() *Stage {
 // GetStage1StartPositions returns the starting positions for stage 1
 func GetStage1StartPositions() (blueX, blueY, redX, redY float64) {
 	// Convert grid coordinates to pixel coordinates
-	return 0, 540, 720, 540
+	return 0, 540, 780, 540
 }

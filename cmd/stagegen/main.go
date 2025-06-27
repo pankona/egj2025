@@ -190,8 +190,6 @@ func generateStageFile(stageData *StageData, outputPath string) error {
 func LoadStage{{.StageNumber}}() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform (full width, 3 cells high at bottom)
-			CreateGridGroundPlatform(),
 {{range .Platforms}}
 			// Regular platform at ({{.X}}, {{.Y}}) size {{.Width}}x{{.Height}}
 			CreateGridPlatform({{.X}}, {{.Y}}, {{.Width}}, {{.Height}}),
