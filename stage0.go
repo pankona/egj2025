@@ -1,8 +1,8 @@
 package main
 
-// LoadStage7 creates stage 7 - Generated from ASCII art
+// LoadStage0 creates stage 0 - Generated from ASCII art
 // Grid layout: 40x31 cells (800x620 pixels with 20px cells)
-func LoadStage7() *Stage {
+func LoadStage0() *Stage {
 	return &Stage{
 		Platforms: []Platform{
 
@@ -18,17 +18,14 @@ func LoadStage7() *Stage {
 			// Regular platform at (3, 12) size 34x1
 			CreateGridPlatform(3, 12, 34, 1),
 
-			// Regular platform at (1, 17) size 4x2
-			CreateGridPlatform(1, 17, 4, 2),
+			// Regular platform at (1, 17) size 6x2
+			CreateGridPlatform(1, 17, 6, 2),
 
-			// Regular platform at (7, 17) size 2x2
-			CreateGridPlatform(7, 17, 2, 2),
+			// Regular platform at (9, 17) size 2x2
+			CreateGridPlatform(9, 17, 2, 2),
 
-			// Regular platform at (11, 17) size 2x2
-			CreateGridPlatform(11, 17, 2, 2),
-
-			// Regular platform at (15, 17) size 2x2
-			CreateGridPlatform(15, 17, 2, 2),
+			// Regular platform at (13, 17) size 4x2
+			CreateGridPlatform(13, 17, 4, 2),
 
 			// Regular platform at (23, 17) size 2x2
 			CreateGridPlatform(23, 17, 2, 2),
@@ -77,23 +74,17 @@ func LoadStage7() *Stage {
 		},
 		Spikes: []Spike{
 
-			// Spike at (5, 18)
-			CreateGridSpike(5, 18),
+			// Spike at (7, 18)
+			CreateGridSpike(7, 18),
 
-			// Spike at (6, 18)
-			CreateGridSpike(6, 18),
+			// Spike at (8, 18)
+			CreateGridSpike(8, 18),
 
-			// Spike at (9, 18)
-			CreateGridSpike(9, 18),
+			// Spike at (11, 18)
+			CreateGridSpike(11, 18),
 
-			// Spike at (10, 18)
-			CreateGridSpike(10, 18),
-
-			// Spike at (13, 18)
-			CreateGridSpike(13, 18),
-
-			// Spike at (14, 18)
-			CreateGridSpike(14, 18),
+			// Spike at (12, 18)
+			CreateGridSpike(12, 18),
 
 			// Spike at (25, 18)
 			CreateGridSpike(25, 18),
@@ -164,8 +155,8 @@ func LoadStage7() *Stage {
 	}
 }
 
-// GetStage7StartPositions returns the starting positions for stage 7
-func GetStage7StartPositions() (blueX, blueY, redX, redY float64) {
+// GetStage0StartPositions returns the starting positions for stage 0
+func GetStage0StartPositions() (blueX, blueY, redX, redY float64) {
 	// Convert grid coordinates to pixel coordinates
-	return 200, 220, 580, 220
+	return 320, 220, 460, 220
 }

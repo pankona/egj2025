@@ -10,8 +10,12 @@ type StageLoader struct {
 
 // NewStageLoader creates a new stage loader
 func NewStageLoader() *StageLoader {
+	startStage := 1
+	if DebugMode {
+		startStage = 0 // Start from debug stage
+	}
 	return &StageLoader{
-		CurrentStageIndex: 1, // Start from stage 1
+		CurrentStageIndex: startStage,
 		// NOTE: TotalStages is hardcoded and must be updated manually when adding stages
 		// TODO: Consider dynamic stage counting for better scalability
 		TotalStages: 10,
@@ -23,6 +27,8 @@ func NewStageLoader() *StageLoader {
 // consider using a map[int]func() *Stage approach for dynamic stage registration.
 func (sl *StageLoader) LoadStage(stageIndex int) *Stage {
 	switch stageIndex {
+	case 0:
+		return LoadStage0()
 	case 1:
 		return LoadStage1()
 	case 2:
@@ -65,7 +71,11 @@ func (sl *StageLoader) NextStage() bool {
 
 // PreviousStage goes back to the previous stage
 func (sl *StageLoader) PreviousStage() bool {
-	if sl.CurrentStageIndex > 1 {
+	minStage := 1
+	if DebugMode {
+		minStage = 0
+	}
+	if sl.CurrentStageIndex > minStage {
 		sl.CurrentStageIndex--
 		return true
 	}
@@ -80,6 +90,8 @@ func (sl *StageLoader) ResetToFirstStage() {
 // GetCurrentStageStartPositions returns the starting positions for the current stage
 func (sl *StageLoader) GetCurrentStageStartPositions() (blueX, blueY, redX, redY float64) {
 	switch sl.CurrentStageIndex {
+	case 0:
+		return GetStage0StartPositions()
 	case 1:
 		return GetStage1StartPositions()
 	case 2:

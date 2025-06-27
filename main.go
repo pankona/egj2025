@@ -42,6 +42,9 @@ const (
 var (
 	// UI colors
 	WhiteColor = color.RGBA{255, 255, 255, 255}
+
+	// Debug mode flag (initialized based on platform)
+	DebugMode bool
 )
 
 type GameState int
@@ -570,6 +573,16 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
+	// Initialize debug mode based on platform
+	initDebugMode()
+
+	// Log debug mode status
+	if DebugMode {
+		log.Println("Debug mode: ENABLED (starting from stage 0)")
+	} else {
+		log.Println("Debug mode: DISABLED (starting from stage 1)")
+	}
+
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("UNION JUMPERS")
 	ebiten.SetWindowResizable(true)

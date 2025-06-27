@@ -25,12 +25,15 @@ fmt: install-tools
 
 generate-stages:
 	@echo "Generating stage files from ASCII art..."
-	@for i in 01 02 03 04 05 06 07 08 09 10; do \
+	@for i in 00 01 02 03 04 05 06 07 08 09 10; do \
 		if [ -f stage$$i.txt ]; then \
 			echo "Generating stage$$i.go from stage$$i.txt"; \
 			go run cmd/stagegen/main.go stage$$i.txt; \
 			if [ -f stage$$i.go ]; then \
 				target_name=stage$$(echo $$i | sed 's/^0*//').go; \
+				if [ "$$target_name" = "stage.go" ]; then \
+					target_name="stage0.go"; \
+				fi; \
 				if [ "stage$$i.go" != "$$target_name" ]; then \
 					mv stage$$i.go $$target_name; \
 				fi; \

@@ -70,6 +70,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **コードをコミットする前に必ず `make fmt` を実行すること**
 - WASMビルドのテストは `make serve-wasm` でローカル確認
 
+## デバッグモード
+- **WASM環境**: URLパラメータ `?debug=true` または `?debug=1` を追加してデバッグモードを有効化
+  - 例: `http://localhost:8080/?debug=true`
+- **ネイティブ環境**: 環境変数 `DEBUG=true` または `DEBUG=1` を設定
+  - 例: `DEBUG=true go run .`
+- デバッグモード有効時は開発用のstage0（stage00.txt）から開始する
+- 通常モードではstage1から開始する
+
 ## 開発時の重要な知見
 
 ### スピード足場の衝突判定

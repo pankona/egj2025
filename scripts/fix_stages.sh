@@ -9,7 +9,7 @@ EXPECTED_HEIGHT=31
 
 echo "ステージファイルを${EXPECTED_WIDTH}文字×${EXPECTED_HEIGHT}行に修正します..."
 
-for i in {01..10}; do
+for i in 00 {01..10}; do
     STAGE_FILE="stage${i}.txt"
     
     if [ ! -f "$STAGE_FILE" ]; then

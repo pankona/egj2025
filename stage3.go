@@ -15,11 +15,17 @@ func LoadStage3() *Stage {
 			// Regular platform at (39, 1) size 1x30
 			CreateGridPlatform(39, 1, 1, 30),
 
-			// Regular platform at (19, 11) size 2x14
-			CreateGridPlatform(19, 11, 2, 14),
+			// Regular platform at (19, 17) size 2x8
+			CreateGridPlatform(19, 17, 2, 8),
 
-			// Regular platform at (3, 14) size 34x1
-			CreateGridPlatform(3, 14, 34, 1),
+			// Regular platform at (1, 19) size 5x1
+			CreateGridPlatform(1, 19, 5, 1),
+
+			// Regular platform at (34, 19) size 6x1
+			CreateGridPlatform(34, 19, 6, 1),
+
+			// Regular platform at (14, 24) size 12x1
+			CreateGridPlatform(14, 24, 12, 1),
 
 			// Regular platform at (1, 29) size 10x2
 			CreateGridPlatform(1, 29, 10, 2),
@@ -33,17 +39,17 @@ func LoadStage3() *Stage {
 			// Goal platform at (19, 27) size 2x2
 			CreateGridGoalPlatform(19, 27, 2, 2),
 
-			// Speed-up platform at (3, 24) size 16x1
-			CreateGridSpeedUpPlatform(3, 24, 16, 1),
+			// Speed-up platform at (3, 24) size 11x1
+			CreateGridSpeedUpPlatform(3, 24, 11, 1),
 
-			// Speed-up platform at (21, 24) size 16x1
-			CreateGridSpeedUpPlatform(21, 24, 16, 1),
+			// Speed-up platform at (26, 24) size 11x1
+			CreateGridSpeedUpPlatform(26, 24, 11, 1),
 
-			// Speed-down platform at (1, 19) size 16x1
-			CreateGridSpeedDownPlatform(1, 19, 16, 1),
+			// Speed-down platform at (6, 19) size 11x1
+			CreateGridSpeedDownPlatform(6, 19, 11, 1),
 
-			// Speed-down platform at (23, 19) size 16x1
-			CreateGridSpeedDownPlatform(23, 19, 16, 1),
+			// Speed-down platform at (23, 19) size 11x1
+			CreateGridSpeedDownPlatform(23, 19, 11, 1),
 		},
 		Spikes: []Spike{
 
@@ -65,5 +71,5 @@ func LoadStage3() *Stage {
 // GetStage3StartPositions returns the starting positions for stage 3
 func GetStage3StartPositions() (blueX, blueY, redX, redY float64) {
 	// Convert grid coordinates to pixel coordinates
-	return 360, 260, 420, 260
+	return 20, 360, 760, 360
 }

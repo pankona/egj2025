@@ -13,8 +13,8 @@ echo "ステージファイルの形式チェックを開始します..."
 echo "規定サイズ: ${EXPECTED_WIDTH}文字×${EXPECTED_HEIGHT}行"
 echo ""
 
-# stage01.txt から stage10.txt をチェック
-for i in {01..10}; do
+# stage00.txt から stage10.txt をチェック
+for i in 00 {01..10}; do
     STAGE_FILE="stage${i}.txt"
     
     if [ ! -f "$STAGE_FILE" ]; then
