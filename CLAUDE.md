@@ -70,6 +70,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **コードをコミットする前に必ず `make fmt` を実行すること**
 - WASMビルドのテストは `make serve-wasm` でローカル確認
 
+## 開発時の重要な知見
+
+### スピード足場の衝突判定
+- **問題**: スピード足場に横からあたった時にキャラクターがすり抜ける
+- **原因**: `!u.OnGround`条件により、地面にいる時に横方向の衝突判定がスキップされる
+- **修正方法**: `isOnTopOfPlatform`チェックを使用し、その特定の足場の上に立っている場合のみ横方向衝突をスキップ
+- **実装**: main.go:712の`updatePhysics`関数内で適切な衝突判定ロジックを実装
+
+### Makefileの自動化機能
+- **ステージ生成の自動フォーマット**: `make generate-stages`実行後に自動的に`make fmt`が実行される
+- **実装場所**: Makefileの`generate-stages`ターゲット末尾で`$(MAKE) fmt`を呼び出し
+- **効果**: ステージファイル生成後の手動フォーマット作業が不要になる
+
+### ステージグリッド拡張時の注意点
+- **対象ファイル**: main.go（ScreenHeight）、CLAUDE.md（仕様）、cmd/stagegen/main.go（テンプレート）、全stage*.txt、全stage*.go
+- **手順**: 
+  1. main.goでScreenHeightを更新（620px = 31行 × 20px）
+  2. 全stage*.txtファイルに底面プラットフォーム行を追加
+  3. stagegen toolのテンプレートコメントを更新
+  4. `make generate-stages`で全stage*.goファイルを再生成
+  5. CLAUDE.mdの仕様を更新
+- **重要**: ステージファイルの行数は必ず指定されたグリッドサイズと一致させる
+
 ## メモリ管理ガイドライン
 - レビュー指摘や開発作業で得られた重要な知見はCLAUDE.mdに記録する
 - 追記する際は事前にユーザーに確認を求める
