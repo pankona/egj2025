@@ -224,15 +224,32 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		platformLeft := platform.X
 		platformRight := platform.X + platform.Width
 		platformTop := platform.Y
+		platformBottom := platform.Y + platform.Height
 
 		// Check if unit is horizontally overlapping with platform
 		horizontalOverlap := unitRight > platformLeft && unitLeft < platformRight
+		// Check if unit is vertically overlapping with platform
+		verticalOverlap := unitBottom > platformTop && unitTop < platformBottom
 
 		// Landing on top of platform (falling down) - skip goal platforms
 		if !platform.IsGoal && horizontalOverlap && u.VY > 0 && unitBottom > platformTop && unitTop < platformTop {
 			u.Y = platformTop - UnitSize
 			u.VY = 0
 			u.OnGround = true
+		}
+
+		// Horizontal collision detection - skip goal platforms
+		if !platform.IsGoal && verticalOverlap && !u.Stopped {
+			// Check collision from left side (moving right)
+			if u.Direction > 0 && unitRight > platformLeft && unitLeft < platformLeft {
+				u.X = platformLeft - UnitSize
+				u.Direction = -1 // Reverse direction to left
+			}
+			// Check collision from right side (moving left)
+			if u.Direction < 0 && unitLeft < platformRight && unitRight > platformRight {
+				u.X = platformRight
+				u.Direction = 1 // Reverse direction to right
+			}
 		}
 	}
 
