@@ -210,7 +210,7 @@ func generateStageFile(stageData *StageData, outputPath string) error {
 	tmpl := `package main
 
 // LoadStage{{.StageNumber}} creates stage {{.StageNumber}} - Generated from ASCII art
-// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
+// Grid layout: 40x31 cells (800x620 pixels with 20px cells)
 func LoadStage{{.StageNumber}}() *Stage {
 	return &Stage{
 		Platforms: []Platform{

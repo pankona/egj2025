@@ -1,7 +1,7 @@
 package main
 
 // LoadStage3 creates stage 3 - Generated from ASCII art
-// Grid layout: 40x30 cells (800x600 pixels with 20px cells)
+// Grid layout: 40x31 cells (800x620 pixels with 20px cells)
 func LoadStage3() *Stage {
 	return &Stage{
 		Platforms: []Platform{
@@ -18,8 +18,8 @@ func LoadStage3() *Stage {
 			// Regular platform at (24, 22) size 5x1
 			CreateGridPlatform(24, 22, 5, 1),
 
-			// Regular platform at (0, 28) size 40x2
-			CreateGridPlatform(0, 28, 40, 2),
+			// Regular platform at (0, 28) size 40x3
+			CreateGridPlatform(0, 28, 40, 3),
 
 			// Goal platform at (4, 26) size 3x1
 			CreateGridGoalPlatform(4, 26, 3, 1),

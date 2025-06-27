@@ -16,7 +16,7 @@ import (
 
 const (
 	ScreenWidth  = 800
-	ScreenHeight = 600
+	ScreenHeight = 620
 
 	// Physics constants
 	SPEED         = 1.5 // Increased for better responsiveness
