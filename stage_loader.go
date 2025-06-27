@@ -77,6 +77,35 @@ func (sl *StageLoader) ResetToFirstStage() {
 	sl.CurrentStageIndex = 1
 }
 
+// GetCurrentStageStartPositions returns the starting positions for the current stage
+func (sl *StageLoader) GetCurrentStageStartPositions() (blueX, blueY, redX, redY float64) {
+	switch sl.CurrentStageIndex {
+	case 1:
+		return GetStage1StartPositions()
+	case 2:
+		return GetStage2StartPositions()
+	case 3:
+		return GetStage3StartPositions()
+	case 4:
+		return GetStage4StartPositions()
+	case 5:
+		return GetStage5StartPositions()
+	case 6:
+		return GetStage6StartPositions()
+	case 7:
+		return GetStage7StartPositions()
+	case 8:
+		return GetStage8StartPositions()
+	case 9:
+		return GetStage9StartPositions()
+	case 10:
+		return GetStage10StartPositions()
+	default:
+		// Default to stage 1 positions if invalid index
+		return GetStage1StartPositions()
+	}
+}
+
 // Common platform colors and definitions
 var (
 	GroundColor   = color.RGBA{100, 100, 100, 255} // Gray for ground

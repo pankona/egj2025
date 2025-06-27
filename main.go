@@ -300,17 +300,20 @@ func (g *Game) checkCleared() bool {
 }
 
 func (g *Game) resetGame() {
-	// Reset units to starting positions
-	g.BlueUnit.X = 100
-	g.BlueUnit.Y = 100
+	// Get starting positions from current stage
+	blueX, blueY, redX, redY := g.StageLoader.GetCurrentStageStartPositions()
+	
+	// Reset units to stage-specific starting positions
+	g.BlueUnit.X = blueX
+	g.BlueUnit.Y = blueY
 	g.BlueUnit.VX = SPEED
 	g.BlueUnit.VY = 0
 	g.BlueUnit.Direction = 1
 	g.BlueUnit.OnGround = false
 	g.BlueUnit.Stopped = false
 
-	g.RedUnit.X = 600
-	g.RedUnit.Y = 100
+	g.RedUnit.X = redX
+	g.RedUnit.Y = redY
 	g.RedUnit.VX = -SPEED
 	g.RedUnit.VY = 0
 	g.RedUnit.Direction = -1
@@ -492,10 +495,13 @@ func main() {
 	// Create sound manager
 	soundManager := NewSoundManager()
 
+	// Get starting positions for the first stage
+	blueX, blueY, redX, redY := stageLoader.GetCurrentStageStartPositions()
+
 	game := &Game{
 		BlueUnit: &Unit{
-			X:         100,
-			Y:         100,
+			X:         blueX,
+			Y:         blueY,
 			VX:        SPEED,
 			VY:        0,
 			Direction: 1,
@@ -504,8 +510,8 @@ func main() {
 			Stopped:   false,
 		},
 		RedUnit: &Unit{
-			X:         600,
-			Y:         100,
+			X:         redX,
+			Y:         redY,
 			VX:        -SPEED,
 			VY:        0,
 			Direction: -1,
