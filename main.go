@@ -475,24 +475,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		x := float32(spike.X)
 		y := float32(spike.Y)
 		size := float32(CellSize)
-
-		// Create a path for the triangle
-		var path vector.Path
-		path.MoveTo(x, y+size)      // bottom-left
-		path.LineTo(x+size, y+size) // bottom-right
-		path.LineTo(x+size/2, y)    // top-center
-		path.Close()                // close the triangle
-
-		// Draw filled triangle
-		vertices, indices := path.AppendVerticesAndIndicesForFilling(nil, nil)
-		r, g, b, a := spike.Color.RGBA()
-		for i := range vertices {
-			vertices[i].ColorR = float32(r) / 65535
-			vertices[i].ColorG = float32(g) / 65535
-			vertices[i].ColorB = float32(b) / 65535
-			vertices[i].ColorA = float32(a) / 65535
-		}
-		screen.DrawTriangles(vertices, indices, nil, nil)
+		
+		// Use vector.DrawFilledRect to create a simple spike representation
+		// Draw as a smaller rectangle at the center to represent spike
+		spikeSize := size * 0.8
+		offset := (size - spikeSize) / 2
+		vector.DrawFilledRect(screen, x+offset, y+offset, spikeSize, spikeSize, spike.Color, false)
 	}
 
 	// Draw stage number in top-left corner during gameplay
