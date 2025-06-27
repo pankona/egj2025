@@ -274,7 +274,7 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		if !platform.IsGoal && verticalOverlap && !u.Stopped {
 			// Only check horizontal collision if unit is not on top of this platform
 			isOnTopOfPlatform := u.OnGround && unitBottom >= platformTop && unitBottom <= platformTop+5
-			
+
 			if !isOnTopOfPlatform {
 				// Check collision from left side (moving right)
 				if u.Direction > 0 && unitRight > platformLeft && unitLeft < platformLeft {
