@@ -92,7 +92,6 @@ func LoadStage1() *Stage {
 
 			// Speed-down platform at (33, 28) size 3x1
 			CreateGridSpeedDownPlatform(33, 28, 3, 1),
-
 		},
 		Spikes: []Spike{
 
@@ -119,7 +118,6 @@ func LoadStage1() *Stage {
 
 			// Spike at (26, 30)
 			CreateGridSpike(26, 30),
-
 		},
 	}
 }
