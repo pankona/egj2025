@@ -30,7 +30,10 @@ generate-stages:
 			echo "Generating stage$$i.go from stage$$i.txt"; \
 			go run cmd/stagegen/main.go stage$$i.txt; \
 			if [ -f stage$$i.go ]; then \
-				mv stage$$i.go stage$$(echo $$i | sed 's/^0*//').go; \
+				target_name=stage$$(echo $$i | sed 's/^0*//').go; \
+				if [ "stage$$i.go" != "$$target_name" ]; then \
+					mv stage$$i.go $$target_name; \
+				fi; \
 			fi; \
 		else \
 			echo "Warning: stage$$i.txt not found"; \

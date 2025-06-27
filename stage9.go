@@ -5,8 +5,6 @@ package main
 func LoadStage9() *Stage {
 	return &Stage{
 		Platforms: []Platform{
-			// Ground platform (full width, 3 cells high at bottom)
-			CreateGridGroundPlatform(),
 
 			// Regular platform at (9, 17) size 5x1
 			CreateGridPlatform(9, 17, 5, 1),

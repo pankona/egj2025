@@ -15,8 +15,14 @@ func LoadStage1() *Stage {
 			// Regular platform at (35, 27) size 1x3
 			CreateGridPlatform(35, 27, 1, 3),
 
-			// Regular platform at (0, 28) size 40x2
-			CreateGridPlatform(0, 28, 40, 2),
+			// Regular platform at (0, 28) size 14x2
+			CreateGridPlatform(0, 28, 14, 2),
+
+			// Regular platform at (16, 28) size 8x2
+			CreateGridPlatform(16, 28, 8, 2),
+
+			// Regular platform at (26, 28) size 14x2
+			CreateGridPlatform(26, 28, 14, 2),
 
 			// Goal platform at (19, 27) size 2x1
 			CreateGridGoalPlatform(19, 27, 2, 1),
