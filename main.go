@@ -19,7 +19,7 @@ const (
 	ScreenHeight = 600
 
 	// Physics constants
-	SPEED         = 1.0
+	SPEED         = 1.5 // Increased for better responsiveness
 	GRAVITY       = 0.35
 	JUMP_STRENGTH = 5.9 // Allows jumping over 2 platforms but not 3
 
