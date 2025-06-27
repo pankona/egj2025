@@ -26,8 +26,11 @@ func LoadStage10() *Stage {
 
 			// Goal platform at (23, 26) size 3x1
 			CreateGridGoalPlatform(23, 26, 3, 1),
+
 		},
-		Spikes: []Spike{},
+		Spikes: []Spike{
+
+		},
 	}
 }
 

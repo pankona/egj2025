@@ -21,7 +21,7 @@ const (
 	// Physics constants
 	SPEED         = 1.0
 	GRAVITY       = 0.35
-	JUMP_STRENGTH = 13.0
+	JUMP_STRENGTH = 5.9 // Allows jumping over 2 platforms but not 3
 
 	// Unit constants
 	UnitSize = 20
@@ -245,7 +245,8 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		}
 
 		// Horizontal collision detection - skip goal platforms
-		if !platform.IsGoal && verticalOverlap && !u.Stopped {
+		// Only check horizontal collision if unit is not landing on top of platform
+		if !platform.IsGoal && verticalOverlap && !u.Stopped && !u.OnGround {
 			// Check collision from left side (moving right)
 			if u.Direction > 0 && unitRight > platformLeft && unitLeft < platformLeft {
 				u.X = platformLeft - UnitSize
