@@ -67,6 +67,11 @@ type Platform struct {
 	IsGoal              bool // Mark this platform as a goal zone
 }
 
+type Spike struct {
+	X, Y  float64
+	Color color.Color
+}
+
 // GridPosition represents a position in the grid coordinate system
 type GridPosition struct {
 	X, Y int
@@ -86,6 +91,7 @@ type GridPlatform struct {
 
 type Stage struct {
 	Platforms []Platform
+	Spikes    []Spike
 }
 
 type SoundManager struct {
@@ -294,7 +300,34 @@ func (u *Unit) jump(soundManager *SoundManager) {
 
 func (g *Game) checkGameOver() bool {
 	// Check if either unit fell off the screen
-	return g.BlueUnit.Y > float64(ScreenHeight) || g.RedUnit.Y > float64(ScreenHeight)
+	if g.BlueUnit.Y > float64(ScreenHeight) || g.RedUnit.Y > float64(ScreenHeight) {
+		return true
+	}
+
+	// Check if either unit touched a spike
+	for _, spike := range g.Stage.Spikes {
+		if g.checkUnitSpikeCollision(g.BlueUnit, spike) || g.checkUnitSpikeCollision(g.RedUnit, spike) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (g *Game) checkUnitSpikeCollision(unit *Unit, spike Spike) bool {
+	unitLeft := unit.X
+	unitRight := unit.X + UnitSize
+	unitTop := unit.Y
+	unitBottom := unit.Y + UnitSize
+
+	spikeLeft := spike.X
+	spikeRight := spike.X + CellSize
+	spikeTop := spike.Y
+	spikeBottom := spike.Y + CellSize
+
+	// Check if unit and spike overlap
+	return unitRight > spikeLeft && unitLeft < spikeRight &&
+		unitBottom > spikeTop && unitTop < spikeBottom
 }
 
 func (g *Game) checkCleared() bool {
@@ -319,7 +352,7 @@ func (g *Game) checkCleared() bool {
 func (g *Game) resetGame() {
 	// Get starting positions from current stage
 	blueX, blueY, redX, redY := g.StageLoader.GetCurrentStageStartPositions()
-	
+
 	// Reset units to stage-specific starting positions
 	g.BlueUnit.X = blueX
 	g.BlueUnit.Y = blueY
@@ -435,6 +468,32 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Draw red unit
 	vector.DrawFilledRect(screen, float32(g.RedUnit.X), float32(g.RedUnit.Y), UnitSize, UnitSize, g.RedUnit.Color, false)
+
+	// Draw spikes as upward triangles
+	for _, spike := range g.Stage.Spikes {
+		// Define triangle vertices (upward pointing)
+		x := float32(spike.X)
+		y := float32(spike.Y)
+		size := float32(CellSize)
+
+		// Create a path for the triangle
+		var path vector.Path
+		path.MoveTo(x, y+size)      // bottom-left
+		path.LineTo(x+size, y+size) // bottom-right
+		path.LineTo(x+size/2, y)    // top-center
+		path.Close()                // close the triangle
+
+		// Draw filled triangle
+		vertices, indices := path.AppendVerticesAndIndicesForFilling(nil, nil)
+		r, g, b, a := spike.Color.RGBA()
+		for i := range vertices {
+			vertices[i].ColorR = float32(r) / 65535
+			vertices[i].ColorG = float32(g) / 65535
+			vertices[i].ColorB = float32(b) / 65535
+			vertices[i].ColorA = float32(a) / 65535
+		}
+		screen.DrawTriangles(vertices, indices, nil, nil)
+	}
 
 	// Draw stage number in top-left corner during gameplay
 	if g.State == StatePlaying {

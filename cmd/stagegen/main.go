@@ -16,6 +16,7 @@ type StageData struct {
 	StageNumber     int
 	Platforms       []PlatformData
 	GoalPlatforms   []PlatformData
+	Spikes          []SpikeData
 	BlueStartX      int
 	BlueStartY      int
 	RedStartX       int
@@ -32,6 +33,12 @@ type PlatformData struct {
 	Y      int
 	Width  int
 	Height int
+}
+
+// SpikeData represents a spike in grid coordinates
+type SpikeData struct {
+	X int
+	Y int
 }
 
 // parseASCIIArt parses ASCII art file and returns stage data
@@ -117,6 +124,9 @@ func parseASCIIArt(filename string) (*StageData, error) {
 				stageData.RedStartPixelX = x * 20
 				stageData.RedStartPixelY = y * 20
 				processed[y][x] = true
+			case '^':
+				stageData.Spikes = append(stageData.Spikes, SpikeData{X: x, Y: y})
+				processed[y][x] = true
 			case '.':
 				processed[y][x] = true
 			default:
@@ -196,6 +206,12 @@ func LoadStage{{.StageNumber}}() *Stage {
 {{end}}{{range .GoalPlatforms}}
 			// Goal platform at ({{.X}}, {{.Y}}) size {{.Width}}x{{.Height}}
 			CreateGridGoalPlatform({{.X}}, {{.Y}}, {{.Width}}, {{.Height}}),
+{{end}}
+		},
+		Spikes: []Spike{
+{{range .Spikes}}
+			// Spike at ({{.X}}, {{.Y}})
+			CreateGridSpike({{.X}}, {{.Y}}),
 {{end}}
 		},
 	}

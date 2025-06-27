@@ -111,6 +111,7 @@ var (
 	GroundColor   = color.RGBA{100, 100, 100, 255} // Gray for ground
 	PlatformColor = color.RGBA{150, 150, 150, 255} // Light gray for platforms
 	GoalColor     = color.RGBA{255, 255, 0, 255}   // Yellow for goal platforms
+	SpikeColor    = color.RGBA{255, 0, 0, 255}     // Red for spikes
 )
 
 // Helper functions for common platform types
@@ -178,4 +179,13 @@ func CreateGridGoalPlatform(x, y, width, height int) Platform {
 		IsGoal:   true,
 	}
 	return GridPlatformToPlatform(gridPlatform, GoalColor)
+}
+
+// CreateGridSpike creates a spike using grid coordinates
+func CreateGridSpike(x, y int) Spike {
+	return Spike{
+		X:     GridToPixelX(x),
+		Y:     GridToPixelY(y),
+		Color: SpikeColor,
+	}
 }
