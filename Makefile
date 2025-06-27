@@ -1,4 +1,4 @@
-.PHONY: lint test build-wasm serve-wasm clean generate-stages
+.PHONY: lint test build-wasm serve-wasm clean generate-stages fmt install-tools
 
 lint:
 	GOOS=js GOARCH=wasm go vet ./...
@@ -40,6 +40,8 @@ generate-stages:
 		fi; \
 	done
 	@echo "Stage generation complete"
+	@echo "Formatting generated files..."
+	$(MAKE) fmt
 
 clean:
 	rm -rf dist
