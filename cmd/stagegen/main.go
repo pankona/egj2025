@@ -13,18 +13,20 @@ import (
 
 // StageData represents the parsed stage data from ASCII art
 type StageData struct {
-	StageNumber     int
-	Platforms       []PlatformData
-	GoalPlatforms   []PlatformData
-	Spikes          []SpikeData
-	BlueStartX      int
-	BlueStartY      int
-	RedStartX       int
-	RedStartY       int
-	BlueStartPixelX int
-	BlueStartPixelY int
-	RedStartPixelX  int
-	RedStartPixelY  int
+	StageNumber        int
+	Platforms          []PlatformData
+	GoalPlatforms      []PlatformData
+	SpeedUpPlatforms   []PlatformData
+	SpeedDownPlatforms []PlatformData
+	Spikes             []SpikeData
+	BlueStartX         int
+	BlueStartY         int
+	RedStartX          int
+	RedStartY          int
+	BlueStartPixelX    int
+	BlueStartPixelY    int
+	RedStartPixelX     int
+	RedStartPixelY     int
 }
 
 // PlatformData represents a platform in grid coordinates
@@ -111,6 +113,18 @@ func parseASCIIArt(filename string) (*StageData, error) {
 				platform := findRectangularPlatform(lines, processed, x, y, 'G')
 				if platform != nil {
 					stageData.GoalPlatforms = append(stageData.GoalPlatforms, *platform)
+				}
+			case 'u':
+				// Find rectangular speed-up platform starting from this position
+				platform := findRectangularPlatform(lines, processed, x, y, 'u')
+				if platform != nil {
+					stageData.SpeedUpPlatforms = append(stageData.SpeedUpPlatforms, *platform)
+				}
+			case 'd':
+				// Find rectangular speed-down platform starting from this position
+				platform := findRectangularPlatform(lines, processed, x, y, 'd')
+				if platform != nil {
+					stageData.SpeedDownPlatforms = append(stageData.SpeedDownPlatforms, *platform)
 				}
 			case 'L':
 				stageData.BlueStartX = x
@@ -206,6 +220,12 @@ func LoadStage{{.StageNumber}}() *Stage {
 {{end}}{{range .GoalPlatforms}}
 			// Goal platform at ({{.X}}, {{.Y}}) size {{.Width}}x{{.Height}}
 			CreateGridGoalPlatform({{.X}}, {{.Y}}, {{.Width}}, {{.Height}}),
+{{end}}{{range .SpeedUpPlatforms}}
+			// Speed-up platform at ({{.X}}, {{.Y}}) size {{.Width}}x{{.Height}}
+			CreateGridSpeedUpPlatform({{.X}}, {{.Y}}, {{.Width}}, {{.Height}}),
+{{end}}{{range .SpeedDownPlatforms}}
+			// Speed-down platform at ({{.X}}, {{.Y}}) size {{.Width}}x{{.Height}}
+			CreateGridSpeedDownPlatform({{.X}}, {{.Y}}, {{.Width}}, {{.Height}}),
 {{end}}
 		},
 		Spikes: []Spike{
@@ -270,6 +290,8 @@ func main() {
 	fmt.Printf("ステージ番号: %d\n", stageData.StageNumber)
 	fmt.Printf("プラットフォーム数: %d\n", len(stageData.Platforms))
 	fmt.Printf("ゴールプラットフォーム数: %d\n", len(stageData.GoalPlatforms))
+	fmt.Printf("スピードアッププラットフォーム数: %d\n", len(stageData.SpeedUpPlatforms))
+	fmt.Printf("スピードダウンプラットフォーム数: %d\n", len(stageData.SpeedDownPlatforms))
 	fmt.Printf("青キャラ開始位置: (%d, %d)\n", stageData.BlueStartX, stageData.BlueStartY)
 	fmt.Printf("赤キャラ開始位置: (%d, %d)\n", stageData.RedStartX, stageData.RedStartY)
 }

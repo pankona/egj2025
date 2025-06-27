@@ -108,10 +108,12 @@ func (sl *StageLoader) GetCurrentStageStartPositions() (blueX, blueY, redX, redY
 
 // Common platform colors and definitions
 var (
-	GroundColor   = color.RGBA{100, 100, 100, 255} // Gray for ground
-	PlatformColor = color.RGBA{150, 150, 150, 255} // Light gray for platforms
-	GoalColor     = color.RGBA{255, 255, 0, 255}   // Yellow for goal platforms
-	SpikeColor    = color.RGBA{255, 0, 0, 255}     // Red for spikes
+	GroundColor    = color.RGBA{100, 100, 100, 255} // Gray for ground
+	PlatformColor  = color.RGBA{150, 150, 150, 255} // Light gray for platforms
+	GoalColor      = color.RGBA{255, 255, 0, 255}   // Yellow for goal platforms
+	SpikeColor     = color.RGBA{255, 0, 0, 255}     // Red for spikes
+	SpeedUpColor   = color.RGBA{0, 255, 100, 255}   // Green for speed-up platforms
+	SpeedDownColor = color.RGBA{255, 100, 0, 255}   // Orange for speed-down platforms
 )
 
 // Helper functions for common platform types
@@ -128,23 +130,25 @@ func CreateGroundPlatform() Platform {
 
 func CreatePlatform(x, y, width, height float64) Platform {
 	return Platform{
-		X:      x,
-		Y:      y,
-		Width:  width,
-		Height: height,
-		Color:  PlatformColor,
-		IsGoal: false,
+		X:             x,
+		Y:             y,
+		Width:         width,
+		Height:        height,
+		Color:         PlatformColor,
+		IsGoal:        false,
+		SpeedModifier: 1.0,
 	}
 }
 
 func CreateGoalPlatform(x, y, width, height float64) Platform {
 	return Platform{
-		X:      x,
-		Y:      y,
-		Width:  width,
-		Height: height,
-		Color:  GoalColor,
-		IsGoal: true,
+		X:             x,
+		Y:             y,
+		Width:         width,
+		Height:        height,
+		Color:         GoalColor,
+		IsGoal:        true,
+		SpeedModifier: 1.0,
 	}
 }
 
@@ -154,9 +158,10 @@ func CreateGoalPlatform(x, y, width, height float64) Platform {
 // Default: full width, 2.5 cells high at bottom
 func CreateGridGroundPlatform() Platform {
 	gridPlatform := GridPlatform{
-		Position: GridPosition{X: 0, Y: GridHeight - 3}, // 3 cells from bottom (2.5 rounded up)
-		Size:     GridSize{Width: GridWidth, Height: 3},
-		IsGoal:   false,
+		Position:      GridPosition{X: 0, Y: GridHeight - 3}, // 3 cells from bottom (2.5 rounded up)
+		Size:          GridSize{Width: GridWidth, Height: 3},
+		IsGoal:        false,
+		SpeedModifier: 1.0,
 	}
 	return GridPlatformToPlatform(gridPlatform, GroundColor)
 }
@@ -164,9 +169,10 @@ func CreateGridGroundPlatform() Platform {
 // CreateGridPlatform creates a platform using grid coordinates
 func CreateGridPlatform(x, y, width, height int) Platform {
 	gridPlatform := GridPlatform{
-		Position: GridPosition{X: x, Y: y},
-		Size:     GridSize{Width: width, Height: height},
-		IsGoal:   false,
+		Position:      GridPosition{X: x, Y: y},
+		Size:          GridSize{Width: width, Height: height},
+		IsGoal:        false,
+		SpeedModifier: 1.0,
 	}
 	return GridPlatformToPlatform(gridPlatform, PlatformColor)
 }
@@ -174,11 +180,34 @@ func CreateGridPlatform(x, y, width, height int) Platform {
 // CreateGridGoalPlatform creates a goal platform using grid coordinates
 func CreateGridGoalPlatform(x, y, width, height int) Platform {
 	gridPlatform := GridPlatform{
-		Position: GridPosition{X: x, Y: y},
-		Size:     GridSize{Width: width, Height: height},
-		IsGoal:   true,
+		Position:      GridPosition{X: x, Y: y},
+		Size:          GridSize{Width: width, Height: height},
+		IsGoal:        true,
+		SpeedModifier: 1.0,
 	}
 	return GridPlatformToPlatform(gridPlatform, GoalColor)
+}
+
+// CreateGridSpeedUpPlatform creates a speed-up platform using grid coordinates
+func CreateGridSpeedUpPlatform(x, y, width, height int) Platform {
+	gridPlatform := GridPlatform{
+		Position:      GridPosition{X: x, Y: y},
+		Size:          GridSize{Width: width, Height: height},
+		IsGoal:        false,
+		SpeedModifier: 1.3, // 30% faster
+	}
+	return GridPlatformToPlatform(gridPlatform, SpeedUpColor)
+}
+
+// CreateGridSpeedDownPlatform creates a speed-down platform using grid coordinates
+func CreateGridSpeedDownPlatform(x, y, width, height int) Platform {
+	gridPlatform := GridPlatform{
+		Position:      GridPosition{X: x, Y: y},
+		Size:          GridSize{Width: width, Height: height},
+		IsGoal:        false,
+		SpeedModifier: 0.7, // 30% slower
+	}
+	return GridPlatformToPlatform(gridPlatform, SpeedDownColor)
 }
 
 // CreateGridSpike creates a spike using grid coordinates

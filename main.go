@@ -64,7 +64,8 @@ type Unit struct {
 type Platform struct {
 	X, Y, Width, Height float64
 	Color               color.Color
-	IsGoal              bool // Mark this platform as a goal zone
+	IsGoal              bool    // Mark this platform as a goal zone
+	SpeedModifier       float64 // Speed multiplier when standing on this platform (1.0 = normal, >1.0 = faster, <1.0 = slower)
 }
 
 type Spike struct {
@@ -84,9 +85,10 @@ type GridSize struct {
 
 // GridPlatform represents a platform in grid coordinates
 type GridPlatform struct {
-	Position GridPosition
-	Size     GridSize
-	IsGoal   bool
+	Position      GridPosition
+	Size          GridSize
+	IsGoal        bool
+	SpeedModifier float64 // Speed multiplier when standing on this platform
 }
 
 type Stage struct {
@@ -168,12 +170,13 @@ func PixelToGridY(pixelY float64) int {
 // GridPlatformToPlatform converts a GridPlatform to a Platform with pixel coordinates
 func GridPlatformToPlatform(gridPlatform GridPlatform, color color.Color) Platform {
 	return Platform{
-		X:      GridToPixelX(gridPlatform.Position.X),
-		Y:      GridToPixelY(gridPlatform.Position.Y),
-		Width:  GridToPixelSize(gridPlatform.Size.Width),
-		Height: GridToPixelSize(gridPlatform.Size.Height),
-		Color:  color,
-		IsGoal: gridPlatform.IsGoal,
+		X:             GridToPixelX(gridPlatform.Position.X),
+		Y:             GridToPixelY(gridPlatform.Position.Y),
+		Width:         GridToPixelSize(gridPlatform.Size.Width),
+		Height:        GridToPixelSize(gridPlatform.Size.Height),
+		Color:         color,
+		IsGoal:        gridPlatform.IsGoal,
+		SpeedModifier: gridPlatform.SpeedModifier,
 	}
 }
 
@@ -196,9 +199,31 @@ func (u *Unit) updatePhysics(stage *Stage) {
 	// Apply gravity
 	u.VY += GRAVITY
 
+	// Calculate current speed modifier based on platforms the unit is standing on
+	speedModifier := 1.0
+	if u.OnGround {
+		for _, platform := range stage.Platforms {
+			// Check if unit is standing on this platform
+			unitLeft := u.X
+			unitRight := u.X + UnitSize
+			unitBottom := u.Y + UnitSize
+
+			platformLeft := platform.X
+			platformRight := platform.X + platform.Width
+			platformTop := platform.Y
+
+			// Check if unit is on top of platform (standing on it)
+			if unitRight > platformLeft && unitLeft < platformRight &&
+				unitBottom >= platformTop && unitBottom <= platformTop+5 { // Small tolerance for "on platform"
+				speedModifier = platform.SpeedModifier
+				break // Use the first matching platform's speed modifier
+			}
+		}
+	}
+
 	// Apply horizontal movement only if not stopped
 	if !u.Stopped {
-		u.VX = SPEED * float64(u.Direction)
+		u.VX = SPEED * float64(u.Direction) * speedModifier
 		// Update horizontal position
 		u.X += u.VX
 	} else {
@@ -245,17 +270,22 @@ func (u *Unit) updatePhysics(stage *Stage) {
 		}
 
 		// Horizontal collision detection - skip goal platforms
-		// Only check horizontal collision if unit is not landing on top of platform
-		if !platform.IsGoal && verticalOverlap && !u.Stopped && !u.OnGround {
-			// Check collision from left side (moving right)
-			if u.Direction > 0 && unitRight > platformLeft && unitLeft < platformLeft {
-				u.X = platformLeft - UnitSize
-				u.Direction = -1 // Reverse direction to left
-			}
-			// Check collision from right side (moving left)
-			if u.Direction < 0 && unitLeft < platformRight && unitRight > platformRight {
-				u.X = platformRight
-				u.Direction = 1 // Reverse direction to right
+		// Check horizontal collision for all non-goal platforms
+		if !platform.IsGoal && verticalOverlap && !u.Stopped {
+			// Only check horizontal collision if unit is not on top of this platform
+			isOnTopOfPlatform := u.OnGround && unitBottom >= platformTop && unitBottom <= platformTop+5
+			
+			if !isOnTopOfPlatform {
+				// Check collision from left side (moving right)
+				if u.Direction > 0 && unitRight > platformLeft && unitLeft < platformLeft {
+					u.X = platformLeft - UnitSize
+					u.Direction = -1 // Reverse direction to left
+				}
+				// Check collision from right side (moving left)
+				if u.Direction < 0 && unitLeft < platformRight && unitRight > platformRight {
+					u.X = platformRight
+					u.Direction = 1 // Reverse direction to right
+				}
 			}
 		}
 	}
@@ -476,7 +506,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		x := float32(spike.X)
 		y := float32(spike.Y)
 		size := float32(CellSize)
-		
+
 		// Use vector.DrawFilledRect to create a simple spike representation
 		// Draw as a smaller rectangle at the center to represent spike
 		spikeSize := size * 0.8
