@@ -1,4 +1,4 @@
-.PHONY: lint test build-wasm serve-wasm clean generate-stages fmt install-tools
+.PHONY: lint test build-wasm serve-wasm clean generate-stages fmt install-tools stagelint stagefix
 
 lint:
 	GOOS=js GOARCH=wasm go vet ./...
@@ -42,6 +42,14 @@ generate-stages:
 	@echo "Stage generation complete"
 	@echo "Formatting generated files..."
 	$(MAKE) fmt
+
+stagelint:
+	@echo "Running stage file format check..."
+	@./scripts/stage_lint.sh
+
+stagefix:
+	@echo "Fixing stage file formats..."
+	@./scripts/fix_stages.sh
 
 clean:
 	rm -rf dist
