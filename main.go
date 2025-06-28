@@ -101,15 +101,15 @@ type Stage struct {
 }
 
 type Game struct {
-	BlueUnit      *Unit
-	RedUnit       *Unit
-	Stage         *Stage
-	State         GameState
-	Font          *text.GoTextFace
-	StageLoader   *StageLoader
-	SoundManager  *SoundManager
-	BlinkCounter  int  // Counter for blinking text animation
-	BlinkVisible  bool // Whether blinking text is currently visible
+	BlueUnit     *Unit
+	RedUnit      *Unit
+	Stage        *Stage
+	State        GameState
+	Font         *text.GoTextFace
+	StageLoader  *StageLoader
+	SoundManager *SoundManager
+	BlinkCounter int  // Counter for blinking text animation
+	BlinkVisible bool // Whether blinking text is currently visible
 }
 
 // Grid coordinate conversion functions
