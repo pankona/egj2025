@@ -25,6 +25,8 @@ type SoundManager struct {
 	audioContext   *audio.Context
 	jumpSoundBytes []byte          // Store decoded jump sound data for creating new players
 	jumpPlayerPool []*audio.Player // Pool of audio players for concurrent playback
+	deadSoundBytes []byte          // Store decoded dead sound data for creating new players
+	deadPlayerPool []*audio.Player // Pool of audio players for dead sound
 	maxConcurrent  int             // Maximum number of concurrent sounds
 	bgmPlayer      *audio.Player   // BGM player for background music (with infinite loop)
 }
@@ -44,7 +46,7 @@ func NewSoundManager() *SoundManager {
 	audioContext := audio.NewContext(SampleRate)
 	maxConcurrent := 5 // Allow up to 5 concurrent jump sounds
 
-	// Decode MP3 file once and store the decoded data
+	// Decode jump MP3 file once and store the decoded data
 	jumpSoundReader := bytes.NewReader(jumpSoundBytes)
 	decodedJumpSound, err := mp3.DecodeWithSampleRate(SampleRate, jumpSoundReader)
 	if err != nil {
@@ -53,33 +55,79 @@ func NewSoundManager() *SoundManager {
 			audioContext:   audioContext,
 			jumpSoundBytes: nil,
 			jumpPlayerPool: nil,
+			deadSoundBytes: nil,
+			deadPlayerPool: nil,
 			maxConcurrent:  maxConcurrent,
 		}
 	}
 
-	// Read all decoded data into bytes for reuse
-	var buf bytes.Buffer
-	_, err = buf.ReadFrom(decodedJumpSound)
+	// Read all decoded jump data into bytes for reuse
+	var jumpBuf bytes.Buffer
+	_, err = jumpBuf.ReadFrom(decodedJumpSound)
 	if err != nil {
 		log.Printf("Failed to read decoded jump sound: %v", err)
 		return &SoundManager{
 			audioContext:   audioContext,
 			jumpSoundBytes: nil,
 			jumpPlayerPool: nil,
+			deadSoundBytes: nil,
+			deadPlayerPool: nil,
 			maxConcurrent:  maxConcurrent,
 		}
 	}
-	jumpSoundData := buf.Bytes()
+	jumpSoundData := jumpBuf.Bytes()
 
-	// Pre-create a pool of players
-	playerPool := make([]*audio.Player, 0, maxConcurrent)
+	// Decode dead MP3 file once and store the decoded data
+	deadSoundReader := bytes.NewReader(deadSoundBytes)
+	decodedDeadSound, err := mp3.DecodeWithSampleRate(SampleRate, deadSoundReader)
+	if err != nil {
+		log.Printf("Failed to decode dead sound: %v", err)
+		return &SoundManager{
+			audioContext:   audioContext,
+			jumpSoundBytes: jumpSoundData,
+			jumpPlayerPool: nil,
+			deadSoundBytes: nil,
+			deadPlayerPool: nil,
+			maxConcurrent:  maxConcurrent,
+		}
+	}
+
+	// Read all decoded dead data into bytes for reuse
+	var deadBuf bytes.Buffer
+	_, err = deadBuf.ReadFrom(decodedDeadSound)
+	if err != nil {
+		log.Printf("Failed to read decoded dead sound: %v", err)
+		return &SoundManager{
+			audioContext:   audioContext,
+			jumpSoundBytes: jumpSoundData,
+			jumpPlayerPool: nil,
+			deadSoundBytes: nil,
+			deadPlayerPool: nil,
+			maxConcurrent:  maxConcurrent,
+		}
+	}
+	deadSoundData := deadBuf.Bytes()
+
+	// Pre-create a pool of jump players
+	jumpPlayerPool := make([]*audio.Player, 0, maxConcurrent)
 	for i := 0; i < maxConcurrent; i++ {
 		player, err := audioContext.NewPlayer(bytes.NewReader(jumpSoundData))
 		if err != nil {
 			log.Printf("Failed to create jump sound player %d: %v", i, err)
 			continue
 		}
-		playerPool = append(playerPool, player)
+		jumpPlayerPool = append(jumpPlayerPool, player)
+	}
+
+	// Pre-create a pool of dead players
+	deadPlayerPool := make([]*audio.Player, 0, maxConcurrent)
+	for i := 0; i < maxConcurrent; i++ {
+		player, err := audioContext.NewPlayer(bytes.NewReader(deadSoundData))
+		if err != nil {
+			log.Printf("Failed to create dead sound player %d: %v", i, err)
+			continue
+		}
+		deadPlayerPool = append(deadPlayerPool, player)
 	}
 
 	// Initialize BGM player
@@ -158,7 +206,9 @@ func NewSoundManager() *SoundManager {
 	return &SoundManager{
 		audioContext:   audioContext,
 		jumpSoundBytes: jumpSoundData,
-		jumpPlayerPool: playerPool,
+		jumpPlayerPool: jumpPlayerPool,
+		deadSoundBytes: deadSoundData,
+		deadPlayerPool: deadPlayerPool,
 		maxConcurrent:  maxConcurrent,
 		bgmPlayer:      bgmPlayer,
 	}
@@ -183,6 +233,30 @@ func (sm *SoundManager) PlayJumpSound() {
 	tempPlayer, err := sm.audioContext.NewPlayer(bytes.NewReader(sm.jumpSoundBytes))
 	if err != nil {
 		log.Printf("Failed to create temporary jump sound player: %v", err)
+		return
+	}
+	tempPlayer.Play()
+}
+
+func (sm *SoundManager) PlayDeadSound() {
+	if sm.deadSoundBytes == nil {
+		return
+	}
+
+	// Find an available player from the pool
+	for _, player := range sm.deadPlayerPool {
+		if player != nil && !player.IsPlaying() {
+			player.Rewind()
+			player.Play()
+			return
+		}
+	}
+
+	// If all players are busy, create a new temporary player
+	// This ensures we can always play a sound even if the pool is exhausted
+	tempPlayer, err := sm.audioContext.NewPlayer(bytes.NewReader(sm.deadSoundBytes))
+	if err != nil {
+		log.Printf("Failed to create temporary dead sound player: %v", err)
 		return
 	}
 	tempPlayer.Play()

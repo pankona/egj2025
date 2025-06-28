@@ -423,6 +423,7 @@ func (g *Game) Update() error {
 
 		// Check game state conditions
 		if g.checkGameOver() {
+			g.SoundManager.PlayDeadSound()
 			g.State = StateGameOver
 		} else if g.checkCleared() {
 			g.State = StateCleared
