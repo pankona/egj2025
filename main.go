@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -97,40 +96,6 @@ type GridPlatform struct {
 type Stage struct {
 	Platforms []Platform
 	Spikes    []Spike
-}
-
-type SoundManager struct {
-	audioContext *audio.Context
-	jumpPlayer   *audio.Player // Audio player for jump sound, reused for better performance
-}
-
-func NewSoundManager() *SoundManager {
-	audioContext := audio.NewContext(SampleRate)
-
-	// TODO: Initialize jump sound player when audio file is available
-	// Example of how to initialize when audio file is loaded:
-	// jumpSound := bytes.NewReader(jumpSoundBytes)
-	// jumpPlayer, err := audio.NewPlayer(audioContext, jumpSound)
-	// if err != nil {
-	//     log.Printf("Failed to create jump sound player: %v", err)
-	//     jumpPlayer = nil
-	// }
-
-	return &SoundManager{
-		audioContext: audioContext,
-		jumpPlayer:   nil, // Will be initialized when audio file is loaded
-	}
-}
-
-func (sm *SoundManager) PlayJumpSound() {
-	// Use reusable audio player for better performance
-	// This avoids creating a new player each time, which was the previous inefficient approach
-	if sm.jumpPlayer != nil && !sm.jumpPlayer.IsPlaying() {
-		sm.jumpPlayer.Rewind()
-		sm.jumpPlayer.Play()
-	}
-	// TODO: When audio file is available, the jumpPlayer will be initialized in NewSoundManager
-	// and this method will work with actual jump sound effects
 }
 
 type Game struct {
@@ -421,6 +386,11 @@ func (g *Game) advanceToNextStageOrRestart() {
 }
 
 func (g *Game) Update() error {
+	// Ensure BGM is playing (NewInfiniteLoop handles the looping automatically)
+	if g.SoundManager.bgmPlayer != nil && !g.SoundManager.bgmPlayer.IsPlaying() {
+		g.SoundManager.StartBGM()
+	}
+
 	switch g.State {
 	case StatePlaying:
 		// Handle keyboard input
@@ -602,6 +572,9 @@ func main() {
 
 	// Create sound manager
 	soundManager := NewSoundManager()
+
+	// Start BGM
+	soundManager.StartBGM()
 
 	// Get starting positions for the first stage
 	blueX, blueY, redX, redY := stageLoader.GetCurrentStageStartPositions()
