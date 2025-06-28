@@ -587,16 +587,26 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		// Draw spikes as upward triangles
 		for _, spike := range g.Stage.Spikes {
-			// Define triangle vertices (upward pointing)
 			x := float32(spike.X)
 			y := float32(spike.Y)
 			size := float32(CellSize)
 
-			// Use vector.DrawFilledRect to create a simple spike representation
-			// Draw as a smaller rectangle at the center to represent spike
-			spikeSize := size * 0.8
-			offset := (size - spikeSize) / 2
-			vector.DrawFilledRect(screen, x+offset, y+offset, spikeSize, spikeSize, spike.Color, false)
+			// Define triangle vertices for upward pointing spike
+			// Bottom left, bottom right, top center
+			vertices := []ebiten.Vertex{
+				{DstX: x, DstY: y + size, SrcX: 0, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},           // Bottom left
+				{DstX: x + size, DstY: y + size, SrcX: 1, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},   // Bottom right  
+				{DstX: x + size/2, DstY: y, SrcX: 0.5, SrcY: 1, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},        // Top center
+			}
+			
+			// Triangle indices (counter-clockwise order)
+			indices := []uint16{0, 1, 2}
+			
+			// Create a 1x1 white pixel image for drawing solid triangles
+			whiteImage := ebiten.NewImage(1, 1)
+			whiteImage.Fill(color.White)
+			
+			screen.DrawTriangles(vertices, indices, whiteImage, nil)
 		}
 
 		// Draw stage number in top-left corner during gameplay
