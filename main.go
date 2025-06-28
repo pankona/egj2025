@@ -642,13 +642,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			if g.StageLoader.CurrentStageIndex == 2 {
 				// Draw instruction text above left spike pit (grid positions 11-12, 30)
 				leftPitOp := &text.DrawOptions{}
-				leftPitOp.GeoM.Translate(160, 460) // Same height as stage 1 text (Y=460)
+				leftPitOp.GeoM.Translate(160, 460)                                  // Same height as stage 1 text (Y=460)
 				leftPitOp.ColorScale.ScaleWithColor(color.RGBA{255, 100, 100, 255}) // Red warning color
 				text.Draw(screen, "Jump over this", g.Font, leftPitOp)
 
 				// Draw instruction text above right spike pit (grid positions 27-28, 30)
 				rightPitOp := &text.DrawOptions{}
-				rightPitOp.GeoM.Translate(480, 460) // Same height as stage 1 text (Y=460)
+				rightPitOp.GeoM.Translate(480, 460)                                  // Same height as stage 1 text (Y=460)
 				rightPitOp.ColorScale.ScaleWithColor(color.RGBA{255, 100, 100, 255}) // Red warning color
 				text.Draw(screen, "Jump over this", g.Font, rightPitOp)
 			}
