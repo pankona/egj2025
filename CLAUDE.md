@@ -21,9 +21,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `make clean` - distフォルダのクリーンアップ
 
 ## ゲームアーキテクチャ
-- **単一ファイル構成**: main.goにすべてのゲームロジックを集約
+- **ファイル構成**: 
+  - main.go: ゲームロジック
+  - sound.go: サウンドシステム
+  - assets.go: リソース埋め込み
+  - stage_loader.go: ステージ管理
+  - 各stage*.go: ステージデータ（自動生成）
 - **Ebitengine Game interface**: Update(), Draw(), Layout()メソッドの実装
-- **ゲーム状態管理**: StatePlaying, StateGameOver, StateCleared
+- **ゲーム状態管理**: StateTitle, StatePlaying, StateGameOver, StateCleared, StateAllCleared
 - **物理演算**: 重力、衝突判定、ジャンプ機能を自作実装
 - **入力処理**: キーボード（F/Jキー）とタッチ（左右画面半分）の両対応
 
@@ -112,6 +117,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **ステージ7-10**: ギミックを攻略しつつ左右非対称になる高難易度ステージ
   - LのキャラとRのキャラの位置が入れ替わり、空間認識の混乱を誘発
   - 全ギミックの複合的な攻略が必要
+
+### サウンドシステムの実装
+- **アーキテクチャ**: sound.goに音声処理を分離、assets.goでリソース埋め込み
+- **音声ファイルの埋め込み**: `//go:embed`ディレクティブで音声ファイルをバイナリに埋め込み
+- **プレイヤープール**: 同じ音を複数同時再生できるよう、事前に複数のaudio.Playerを作成
+- **BGMループ制御**: 
+  - `audio.NewInfiniteLoop`と`audio.NewInfiniteLoopWithIntro`を使用
+  - バイト単位での精密なループポイント制御（サンプル境界へのアラインメント必須）
+  - ループ開始/終了位置を`BGM_LOOP_START_BYTES`/`BGM_LOOP_END_BYTES`で定義
+- **効果音の種類と用途**:
+  - jump.mp3: キャラクターのジャンプ時
+  - shot.mp3: タイトル画面でゲーム開始時
+  - clear.mp3: ステージクリア時、全ステージクリア画面遷移時
+  - bakuhatsu.mp3: キャラクター死亡時（dead.mp3から変更）
+
+### ゲーム状態管理の拡張
+- **状態の種類**:
+  - StateTitle: タイトル画面
+  - StateTitleTransition: タイトルからゲームへの遷移中（1秒間）
+  - StatePlaying: ゲームプレイ中
+  - StateGameOver: ゲームオーバー画面
+  - StateCleared: ステージクリア画面
+  - StateAllCleared: 全ステージクリア画面
+- **画面遷移の演出**: TransitionTimerを使用した時間差遷移の実装
+- **BGM制御**: ゲーム状態に応じた自動的なBGM開始/停止
+
+### 入力処理のベストプラクティス
+- **キー入力の使い分け**:
+  - `inpututil.AppendPressedKeys`: 押されている間ずっと反応（避けるべき）
+  - `inpututil.AppendJustPressedKeys`: 押された瞬間のみ反応（推奨）
+- **問題例**: タイトル画面でPressedKeysを使うと、キーを押している間ずっと画面遷移が発生
+- **解決策**: JustPressedKeysを使用して、1回のキー押下で1回だけ反応するように実装
+
+### デバッグモードの拡張活用
+- **ステージ数の動的変更**: デバッグモード時はTotalStagesを1に設定
+- **効果**: Stage 0 → Stage 1 → 全ステージクリア画面の流れを素早くテスト可能
+- **実装例**:
+  ```go
+  totalStages := 10
+  if DebugMode {
+      totalStages = 1  // デバッグ時は1ステージのみ
+  }
+  ```
+
+### コミット時の注意事項
+- **アセットファイルの選択的コミット**: `assets/`フォルダ内は全ファイルをコミットせず、使用するファイルのみを選択
+- **コミット例**: `git add assets/shot.mp3` のように個別に追加
+- **理由**: 不要なアセットファイルでリポジトリサイズが増大するのを防ぐ
 
 ## メモリ管理ガイドライン
 - レビュー指摘や開発作業で得られた重要な知見はCLAUDE.mdに記録する
