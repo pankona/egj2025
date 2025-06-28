@@ -20,7 +20,7 @@ func NewStageLoader() *StageLoader {
 		// In debug mode, set to 1 for easier testing of all stages cleared screen
 		totalStages = 1
 	}
-	
+
 	return &StageLoader{
 		CurrentStageIndex: startStage,
 		// NOTE: TotalStages is hardcoded and must be updated manually when adding stages

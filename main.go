@@ -49,8 +49,8 @@ var (
 type GameState int
 
 const (
-	StateTitle GameState = iota
-	StateTitleTransition // Transition state after pressing key on title
+	StateTitle           GameState = iota
+	StateTitleTransition           // Transition state after pressing key on title
 	StatePlaying
 	StateGameOver
 	StateCleared
@@ -102,15 +102,15 @@ type Stage struct {
 }
 
 type Game struct {
-	BlueUnit      *Unit
-	RedUnit       *Unit
-	Stage         *Stage
-	State         GameState
-	Font          *text.GoTextFace
-	StageLoader   *StageLoader
-	SoundManager  *SoundManager
-	BlinkCounter  int  // Counter for blinking text animation
-	BlinkVisible  bool // Whether blinking text is currently visible
+	BlueUnit        *Unit
+	RedUnit         *Unit
+	Stage           *Stage
+	State           GameState
+	Font            *text.GoTextFace
+	StageLoader     *StageLoader
+	SoundManager    *SoundManager
+	BlinkCounter    int  // Counter for blinking text animation
+	BlinkVisible    bool // Whether blinking text is currently visible
 	TransitionTimer int  // Timer for screen transitions
 }
 
@@ -710,13 +710,13 @@ func main() {
 			OnGround:  false,
 			Stopped:   false,
 		},
-		Stage:        stageLoader.GetCurrentStage(), // Load first stage
-		State:        StateTitle,                    // Start with title screen
-		Font:         font,
-		StageLoader:  stageLoader,
-		SoundManager: soundManager,
-		BlinkCounter: 0,
-		BlinkVisible: true,
+		Stage:           stageLoader.GetCurrentStage(), // Load first stage
+		State:           StateTitle,                    // Start with title screen
+		Font:            font,
+		StageLoader:     stageLoader,
+		SoundManager:    soundManager,
+		BlinkCounter:    0,
+		BlinkVisible:    true,
 		TransitionTimer: 0,
 	}
 	if err := ebiten.RunGame(game); err != nil {
