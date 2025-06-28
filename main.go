@@ -49,9 +49,11 @@ var (
 type GameState int
 
 const (
-	StatePlaying GameState = iota
+	StateTitle GameState = iota
+	StatePlaying
 	StateGameOver
 	StateCleared
+	StateAllCleared
 )
 
 type Unit struct {
@@ -99,13 +101,15 @@ type Stage struct {
 }
 
 type Game struct {
-	BlueUnit     *Unit
-	RedUnit      *Unit
-	Stage        *Stage
-	State        GameState
-	Font         *text.GoTextFace
-	StageLoader  *StageLoader
-	SoundManager *SoundManager
+	BlueUnit      *Unit
+	RedUnit       *Unit
+	Stage         *Stage
+	State         GameState
+	Font          *text.GoTextFace
+	StageLoader   *StageLoader
+	SoundManager  *SoundManager
+	BlinkCounter  int  // Counter for blinking text animation
+	BlinkVisible  bool // Whether blinking text is currently visible
 }
 
 // Grid coordinate conversion functions
@@ -378,22 +382,45 @@ func (g *Game) advanceToNextStageOrRestart() {
 	if g.StageLoader.NextStage() {
 		// Advanced to next stage, reset game with new stage
 		g.resetGame()
+		// Restart BGM when advancing to next stage
+		g.SoundManager.StartBGM()
 	} else {
-		// No more stages, restart from stage 1
-		g.StageLoader.ResetToFirstStage()
-		g.resetGame()
+		// No more stages, go to all cleared state
+		g.State = StateAllCleared
+		g.SoundManager.StopBGM()
 	}
-	// Restart BGM when advancing to next stage or restarting
-	g.SoundManager.StartBGM()
 }
 
 func (g *Game) Update() error {
+	// Update blinking animation for title and all cleared screens
+	g.BlinkCounter++
+	if g.BlinkCounter >= 30 { // Blink every 30 frames (0.5 seconds at 60 FPS)
+		g.BlinkVisible = !g.BlinkVisible
+		g.BlinkCounter = 0
+	}
+
 	// Ensure BGM is playing only during gameplay (NewInfiniteLoop handles the looping automatically)
 	if g.State == StatePlaying && g.SoundManager.bgmPlayer != nil && !g.SoundManager.bgmPlayer.IsPlaying() {
 		g.SoundManager.StartBGM()
 	}
 
 	switch g.State {
+	case StateTitle:
+		// Handle any key to start game
+		// Check keyboard input
+		keys := inpututil.AppendPressedKeys(nil)
+		if len(keys) > 0 {
+			g.State = StatePlaying
+			g.SoundManager.StartBGM()
+		}
+
+		// Handle touch input
+		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
+		if len(touchIDs) > 0 {
+			g.State = StatePlaying
+			g.SoundManager.StartBGM()
+		}
+
 	case StatePlaying:
 		// Handle keyboard input
 		// F key for blue unit jump
@@ -458,89 +485,155 @@ func (g *Game) Update() error {
 		if len(touchIDs) > 0 {
 			g.advanceToNextStageOrRestart()
 		}
+
+	case StateAllCleared:
+		// Handle any key to restart from stage 1
+		// Check keyboard input
+		keys := inpututil.AppendPressedKeys(nil)
+		if len(keys) > 0 {
+			g.StageLoader.ResetToFirstStage()
+			g.resetGame()
+			g.SoundManager.StartBGM()
+		}
+
+		// Handle touch input
+		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
+		if len(touchIDs) > 0 {
+			g.StageLoader.ResetToFirstStage()
+			g.resetGame()
+			g.SoundManager.StartBGM()
+		}
 	}
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Draw platforms
-	for _, platform := range g.Stage.Platforms {
-		platformColor := platform.Color
-		// Highlight goal platforms
-		if platform.IsGoal {
-			platformColor = color.RGBA{255, 255, 0, 255} // Yellow for goal
-		}
-		vector.DrawFilledRect(screen, float32(platform.X), float32(platform.Y), float32(platform.Width), float32(platform.Height), platformColor, false)
-	}
-
-	// Draw blue unit
-	vector.DrawFilledRect(screen, float32(g.BlueUnit.X), float32(g.BlueUnit.Y), UnitSize, UnitSize, g.BlueUnit.Color, false)
-
-	// Draw red unit
-	vector.DrawFilledRect(screen, float32(g.RedUnit.X), float32(g.RedUnit.Y), UnitSize, UnitSize, g.RedUnit.Color, false)
-
-	// Draw spikes as upward triangles
-	for _, spike := range g.Stage.Spikes {
-		// Define triangle vertices (upward pointing)
-		x := float32(spike.X)
-		y := float32(spike.Y)
-		size := float32(CellSize)
-
-		// Use vector.DrawFilledRect to create a simple spike representation
-		// Draw as a smaller rectangle at the center to represent spike
-		spikeSize := size * 0.8
-		offset := (size - spikeSize) / 2
-		vector.DrawFilledRect(screen, x+offset, y+offset, spikeSize, spikeSize, spike.Color, false)
-	}
-
-	// Draw stage number in top-left corner during gameplay
-	if g.State == StatePlaying {
-		stageText := fmt.Sprintf("Stage %d", g.StageLoader.CurrentStageIndex)
-		op := &text.DrawOptions{}
-		op.GeoM.Translate(StageTextX, StageTextY)
-		op.ColorScale.ScaleWithColor(WhiteColor)
-		text.Draw(screen, stageText, g.Font, op)
-	}
-
-	// Draw game state text with background
 	switch g.State {
-	case StateGameOver:
-		// Draw semi-transparent background
-		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
+	case StateTitle:
+		// TODO: Add background image for title screen
+		// Draw semi-transparent background for now
+		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{20, 30, 50, 255}, false)
 
-		// Draw first line
-		op1 := &text.DrawOptions{}
-		op1.GeoM.Translate(float64(ScreenWidth/2-80), float64(ScreenHeight/2-30))
-		op1.ColorScale.ScaleWithColor(WhiteColor)
-		text.Draw(screen, "GAME OVER", g.Font, op1)
+		// Draw title
+		titleOp := &text.DrawOptions{}
+		titleOp.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2-80))
+		titleOp.ColorScale.ScaleWithColor(WhiteColor)
+		text.Draw(screen, "UNION JUMPERS", g.Font, titleOp)
 
-		// Draw second line
-		op2 := &text.DrawOptions{}
-		op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
-		op2.ColorScale.ScaleWithColor(WhiteColor)
-		text.Draw(screen, "Press SPACE to retry", g.Font, op2)
+		// Draw blinking "Press any key to start" text
+		if g.BlinkVisible {
+			startOp := &text.DrawOptions{}
+			startOp.GeoM.Translate(float64(ScreenWidth/2-130), float64(ScreenHeight/2-20))
+			startOp.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, "Press any key to start", g.Font, startOp)
+		}
 
-	case StateCleared:
-		// Draw semi-transparent background
-		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
+	case StateAllCleared:
+		// TODO: Add background image for all cleared screen
+		// Draw semi-transparent background for now
+		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{50, 20, 50, 255}, false)
 
-		// Draw first line
-		op1 := &text.DrawOptions{}
-		op1.GeoM.Translate(float64(ScreenWidth/2-100), float64(ScreenHeight/2-30))
-		op1.ColorScale.ScaleWithColor(WhiteColor)
-		text.Draw(screen, "STAGE CLEARED!", g.Font, op1)
+		// Draw congratulations message
+		congratsOp := &text.DrawOptions{}
+		congratsOp.GeoM.Translate(float64(ScreenWidth/2-140), float64(ScreenHeight/2-80))
+		congratsOp.ColorScale.ScaleWithColor(color.RGBA{255, 255, 100, 255}) // Golden color
+		text.Draw(screen, "Congratulations!", g.Font, congratsOp)
 
-		// Draw second line
-		op2 := &text.DrawOptions{}
-		if g.StageLoader.CurrentStageIndex < g.StageLoader.TotalStages {
-			op2.GeoM.Translate(float64(ScreenWidth/2-140), float64(ScreenHeight/2+10))
-			op2.ColorScale.ScaleWithColor(WhiteColor)
-			text.Draw(screen, "Press SPACE for next stage", g.Font, op2)
-		} else {
+		// Draw completion message
+		completeOp := &text.DrawOptions{}
+		completeOp.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2-40))
+		completeOp.ColorScale.ScaleWithColor(WhiteColor)
+		text.Draw(screen, "All stages cleared!", g.Font, completeOp)
+
+		// Draw blinking restart message
+		if g.BlinkVisible {
+			restartOp := &text.DrawOptions{}
+			restartOp.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+20))
+			restartOp.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, "Press any key to restart", g.Font, restartOp)
+		}
+
+	default:
+		// Draw gameplay elements (StatePlaying, StateGameOver, StateCleared)
+		// Draw platforms
+		for _, platform := range g.Stage.Platforms {
+			platformColor := platform.Color
+			// Highlight goal platforms
+			if platform.IsGoal {
+				platformColor = color.RGBA{255, 255, 0, 255} // Yellow for goal
+			}
+			vector.DrawFilledRect(screen, float32(platform.X), float32(platform.Y), float32(platform.Width), float32(platform.Height), platformColor, false)
+		}
+
+		// Draw blue unit
+		vector.DrawFilledRect(screen, float32(g.BlueUnit.X), float32(g.BlueUnit.Y), UnitSize, UnitSize, g.BlueUnit.Color, false)
+
+		// Draw red unit
+		vector.DrawFilledRect(screen, float32(g.RedUnit.X), float32(g.RedUnit.Y), UnitSize, UnitSize, g.RedUnit.Color, false)
+
+		// Draw spikes as upward triangles
+		for _, spike := range g.Stage.Spikes {
+			// Define triangle vertices (upward pointing)
+			x := float32(spike.X)
+			y := float32(spike.Y)
+			size := float32(CellSize)
+
+			// Use vector.DrawFilledRect to create a simple spike representation
+			// Draw as a smaller rectangle at the center to represent spike
+			spikeSize := size * 0.8
+			offset := (size - spikeSize) / 2
+			vector.DrawFilledRect(screen, x+offset, y+offset, spikeSize, spikeSize, spike.Color, false)
+		}
+
+		// Draw stage number in top-left corner during gameplay
+		if g.State == StatePlaying {
+			stageText := fmt.Sprintf("Stage %d", g.StageLoader.CurrentStageIndex)
+			op := &text.DrawOptions{}
+			op.GeoM.Translate(StageTextX, StageTextY)
+			op.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, stageText, g.Font, op)
+		}
+
+		// Draw game state overlay text with background
+		switch g.State {
+		case StateGameOver:
+			// Draw semi-transparent background
+			vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
+
+			// Draw first line
+			op1 := &text.DrawOptions{}
+			op1.GeoM.Translate(float64(ScreenWidth/2-80), float64(ScreenHeight/2-30))
+			op1.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, "GAME OVER", g.Font, op1)
+
+			// Draw second line
+			op2 := &text.DrawOptions{}
 			op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
 			op2.ColorScale.ScaleWithColor(WhiteColor)
-			text.Draw(screen, "Press SPACE to restart", g.Font, op2)
+			text.Draw(screen, "Press SPACE to retry", g.Font, op2)
+
+		case StateCleared:
+			// Draw semi-transparent background
+			vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{0, 0, 0, 150}, false)
+
+			// Draw first line
+			op1 := &text.DrawOptions{}
+			op1.GeoM.Translate(float64(ScreenWidth/2-100), float64(ScreenHeight/2-30))
+			op1.ColorScale.ScaleWithColor(WhiteColor)
+			text.Draw(screen, "STAGE CLEARED!", g.Font, op1)
+
+			// Draw second line
+			op2 := &text.DrawOptions{}
+			if g.StageLoader.CurrentStageIndex < g.StageLoader.TotalStages {
+				op2.GeoM.Translate(float64(ScreenWidth/2-140), float64(ScreenHeight/2+10))
+				op2.ColorScale.ScaleWithColor(WhiteColor)
+				text.Draw(screen, "Press SPACE for next stage", g.Font, op2)
+			} else {
+				op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
+				op2.ColorScale.ScaleWithColor(WhiteColor)
+				text.Draw(screen, "Press SPACE to restart", g.Font, op2)
+			}
 		}
 	}
 }
@@ -562,7 +655,7 @@ func main() {
 
 	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
 	ebiten.SetWindowTitle("UNION JUMPERS")
-	ebiten.SetWindowResizable(true)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	// Initialize font
 	fontSource, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
@@ -579,9 +672,6 @@ func main() {
 
 	// Create sound manager
 	soundManager := NewSoundManager()
-
-	// Start BGM
-	soundManager.StartBGM()
 
 	// Get starting positions for the first stage
 	blueX, blueY, redX, redY := stageLoader.GetCurrentStageStartPositions()
@@ -608,10 +698,12 @@ func main() {
 			Stopped:   false,
 		},
 		Stage:        stageLoader.GetCurrentStage(), // Load first stage
-		State:        StatePlaying,
+		State:        StateTitle,                    // Start with title screen
 		Font:         font,
 		StageLoader:  stageLoader,
 		SoundManager: soundManager,
+		BlinkCounter: 0,
+		BlinkVisible: true,
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
