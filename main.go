@@ -657,23 +657,23 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			if g.StageLoader.CurrentStageIndex == 3 {
 				// Draw instruction text above speed-down platforms (grid positions 6,19 and 23,19)
 				leftSpeedDownOp := &text.DrawOptions{}
-				leftSpeedDownOp.GeoM.Translate(160, 340) // Moved up from 360 to 340
+				leftSpeedDownOp.GeoM.Translate(160, 340)                                 // Moved up from 360 to 340
 				leftSpeedDownOp.ColorScale.ScaleWithColor(color.RGBA{255, 150, 50, 255}) // Orange color (speed-down)
 				text.Draw(screen, "Speed Down", g.Font, leftSpeedDownOp)
 
 				rightSpeedDownOp := &text.DrawOptions{}
-				rightSpeedDownOp.GeoM.Translate(480, 340) // Moved up from 360 to 340
+				rightSpeedDownOp.GeoM.Translate(480, 340)                                 // Moved up from 360 to 340
 				rightSpeedDownOp.ColorScale.ScaleWithColor(color.RGBA{255, 150, 50, 255}) // Orange color (speed-down)
 				text.Draw(screen, "Speed Down", g.Font, rightSpeedDownOp)
 
 				// Draw instruction text above speed-up platforms (grid positions 3,24 and 26,24)
 				leftSpeedUpOp := &text.DrawOptions{}
-				leftSpeedUpOp.GeoM.Translate(140, 440) // Moved up from 460 to 440
+				leftSpeedUpOp.GeoM.Translate(140, 440)                                 // Moved up from 460 to 440
 				leftSpeedUpOp.ColorScale.ScaleWithColor(color.RGBA{50, 255, 150, 255}) // Green color (speed-up)
 				text.Draw(screen, "Speed Up", g.Font, leftSpeedUpOp)
 
 				rightSpeedUpOp := &text.DrawOptions{}
-				rightSpeedUpOp.GeoM.Translate(540, 440) // Moved up from 460 to 440
+				rightSpeedUpOp.GeoM.Translate(540, 440)                                 // Moved up from 460 to 440
 				rightSpeedUpOp.ColorScale.ScaleWithColor(color.RGBA{50, 255, 150, 255}) // Green color (speed-up)
 				text.Draw(screen, "Speed Up", g.Font, rightSpeedUpOp)
 			}
