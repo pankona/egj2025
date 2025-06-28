@@ -18,8 +18,14 @@ func LoadStage6() *Stage {
 			// Regular platform at (19, 9) size 2x16
 			CreateGridPlatform(19, 9, 2, 16),
 
-			// Regular platform at (3, 12) size 34x1
-			CreateGridPlatform(3, 12, 34, 1),
+			// Regular platform at (3, 12) size 3x1
+			CreateGridPlatform(3, 12, 3, 1),
+
+			// Regular platform at (11, 12) size 18x1
+			CreateGridPlatform(11, 12, 18, 1),
+
+			// Regular platform at (34, 12) size 3x1
+			CreateGridPlatform(34, 12, 3, 1),
 
 			// Regular platform at (1, 17) size 4x2
 			CreateGridPlatform(1, 17, 4, 2),
@@ -54,17 +60,17 @@ func LoadStage6() *Stage {
 			// Regular platform at (11, 23) size 2x2
 			CreateGridPlatform(11, 23, 2, 2),
 
-			// Regular platform at (15, 23) size 8x2
-			CreateGridPlatform(15, 23, 8, 2),
+			// Regular platform at (15, 23) size 10x2
+			CreateGridPlatform(15, 23, 10, 2),
 
-			// Regular platform at (25, 23) size 2x2
-			CreateGridPlatform(25, 23, 2, 2),
+			// Regular platform at (27, 23) size 2x2
+			CreateGridPlatform(27, 23, 2, 2),
 
-			// Regular platform at (29, 23) size 2x2
-			CreateGridPlatform(29, 23, 2, 2),
+			// Regular platform at (31, 23) size 2x2
+			CreateGridPlatform(31, 23, 2, 2),
 
-			// Regular platform at (33, 23) size 4x2
-			CreateGridPlatform(33, 23, 4, 2),
+			// Regular platform at (35, 23) size 2x2
+			CreateGridPlatform(35, 23, 2, 2),
 
 			// Regular platform at (1, 29) size 10x2
 			CreateGridPlatform(1, 29, 10, 2),
@@ -77,6 +83,12 @@ func LoadStage6() *Stage {
 
 			// Goal platform at (19, 27) size 2x2
 			CreateGridGoalPlatform(19, 27, 2, 2),
+
+			// Speed-up platform at (29, 12) size 5x1
+			CreateGridSpeedUpPlatform(29, 12, 5, 1),
+
+			// Speed-down platform at (6, 12) size 5x1
+			CreateGridSpeedDownPlatform(6, 12, 5, 1),
 		},
 		Spikes: []Spike{
 
@@ -134,23 +146,23 @@ func LoadStage6() *Stage {
 			// Spike at (14, 24)
 			CreateGridSpike(14, 24),
 
-			// Spike at (23, 24)
-			CreateGridSpike(23, 24),
+			// Spike at (25, 24)
+			CreateGridSpike(25, 24),
 
-			// Spike at (24, 24)
-			CreateGridSpike(24, 24),
+			// Spike at (26, 24)
+			CreateGridSpike(26, 24),
 
-			// Spike at (27, 24)
-			CreateGridSpike(27, 24),
+			// Spike at (29, 24)
+			CreateGridSpike(29, 24),
 
-			// Spike at (28, 24)
-			CreateGridSpike(28, 24),
+			// Spike at (30, 24)
+			CreateGridSpike(30, 24),
 
-			// Spike at (31, 24)
-			CreateGridSpike(31, 24),
+			// Spike at (33, 24)
+			CreateGridSpike(33, 24),
 
-			// Spike at (32, 24)
-			CreateGridSpike(32, 24),
+			// Spike at (34, 24)
+			CreateGridSpike(34, 24),
 
 			// Spike at (11, 30)
 			CreateGridSpike(11, 30),
