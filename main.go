@@ -606,6 +606,37 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			op.GeoM.Translate(StageTextX, StageTextY)
 			op.ColorScale.ScaleWithColor(WhiteColor)
 			text.Draw(screen, stageText, g.Font, op)
+
+			// Draw stage 1 specific tutorial text
+			if g.StageLoader.CurrentStageIndex == 1 {
+				// Draw instruction text for blue character (left side) - fixed position
+				blueInstructionOp := &text.DrawOptions{}
+				blueInstructionOp.GeoM.Translate(50, 440) // Same height as Goal Platform (460) minus 20 for "Press F key"
+				blueInstructionOp.ColorScale.ScaleWithColor(color.RGBA{200, 200, 255, 255}) // Light blue
+				text.Draw(screen, "Press F key", g.Font, blueInstructionOp)
+
+				blueJumpOp := &text.DrawOptions{}
+				blueJumpOp.GeoM.Translate(60, 460) // Same height as Goal Platform
+				blueJumpOp.ColorScale.ScaleWithColor(color.RGBA{200, 200, 255, 255}) // Light blue
+				text.Draw(screen, "to Jump", g.Font, blueJumpOp)
+
+				// Draw instruction text for red character (right side) - fixed position with more left margin
+				redInstructionOp := &text.DrawOptions{}
+				redInstructionOp.GeoM.Translate(600, 440) // Moved left from 650 to 600 for better spacing
+				redInstructionOp.ColorScale.ScaleWithColor(color.RGBA{255, 200, 200, 255}) // Light red
+				text.Draw(screen, "Press J key", g.Font, redInstructionOp)
+
+				redJumpOp := &text.DrawOptions{}
+				redJumpOp.GeoM.Translate(610, 460) // Same height as Goal Platform, moved left accordingly
+				redJumpOp.ColorScale.ScaleWithColor(color.RGBA{255, 200, 200, 255}) // Light red
+				text.Draw(screen, "to Jump", g.Font, redJumpOp)
+
+				// Draw goal instruction above goal platform - fixed position
+				goalInstructionOp := &text.DrawOptions{}
+				goalInstructionOp.GeoM.Translate(340, 460) // Fixed position above goal area
+				goalInstructionOp.ColorScale.ScaleWithColor(color.RGBA{255, 255, 100, 255}) // Golden color
+				text.Draw(screen, "Goal Platform", g.Font, goalInstructionOp)
+			}
 		}
 
 		// Draw game state overlay text with background
