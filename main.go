@@ -109,9 +109,9 @@ type Game struct {
 	Font            *text.GoTextFace
 	StageLoader     *StageLoader
 	SoundManager    *SoundManager
-	BlinkCounter    int  // Counter for blinking text animation
-	BlinkVisible    bool // Whether blinking text is currently visible
-	TransitionTimer int  // Timer for screen transitions
+	BlinkCounter    int           // Counter for blinking text animation
+	BlinkVisible    bool          // Whether blinking text is currently visible
+	TransitionTimer int           // Timer for screen transitions
 	WhitePixel      *ebiten.Image // Reusable 1x1 white pixel for triangle rendering
 }
 
