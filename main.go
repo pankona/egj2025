@@ -579,11 +579,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			vector.DrawFilledRect(screen, float32(platform.X), float32(platform.Y), float32(platform.Width), float32(platform.Height), platformColor, false)
 		}
 
-		// Draw blue unit
-		vector.DrawFilledRect(screen, float32(g.BlueUnit.X), float32(g.BlueUnit.Y), UnitSize, UnitSize, g.BlueUnit.Color, false)
+		// Draw blue unit as circle
+		blueCenterX := float32(g.BlueUnit.X) + UnitSize/2
+		blueCenterY := float32(g.BlueUnit.Y) + UnitSize/2
+		vector.DrawFilledCircle(screen, blueCenterX, blueCenterY, UnitSize/2, g.BlueUnit.Color, false)
 
-		// Draw red unit
-		vector.DrawFilledRect(screen, float32(g.RedUnit.X), float32(g.RedUnit.Y), UnitSize, UnitSize, g.RedUnit.Color, false)
+		// Draw red unit as circle
+		redCenterX := float32(g.RedUnit.X) + UnitSize/2
+		redCenterY := float32(g.RedUnit.Y) + UnitSize/2
+		vector.DrawFilledCircle(screen, redCenterX, redCenterY, UnitSize/2, g.RedUnit.Color, false)
 
 		// Draw spikes as upward triangles
 		for _, spike := range g.Stage.Spikes {
