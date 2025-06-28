@@ -383,11 +383,13 @@ func (g *Game) advanceToNextStageOrRestart() {
 		g.StageLoader.ResetToFirstStage()
 		g.resetGame()
 	}
+	// Restart BGM when advancing to next stage or restarting
+	g.SoundManager.StartBGM()
 }
 
 func (g *Game) Update() error {
-	// Ensure BGM is playing (NewInfiniteLoop handles the looping automatically)
-	if g.SoundManager.bgmPlayer != nil && !g.SoundManager.bgmPlayer.IsPlaying() {
+	// Ensure BGM is playing only during gameplay (NewInfiniteLoop handles the looping automatically)
+	if g.State == StatePlaying && g.SoundManager.bgmPlayer != nil && !g.SoundManager.bgmPlayer.IsPlaying() {
 		g.SoundManager.StartBGM()
 	}
 
@@ -426,6 +428,8 @@ func (g *Game) Update() error {
 			g.SoundManager.PlayDeadSound()
 			g.State = StateGameOver
 		} else if g.checkCleared() {
+			g.SoundManager.StopBGM()
+			g.SoundManager.PlayClearSound()
 			g.State = StateCleared
 		}
 
@@ -433,12 +437,14 @@ func (g *Game) Update() error {
 		// Handle restart with space key
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 			g.resetGame()
+			g.SoundManager.StartBGM()
 		}
 
 		// Handle touch input for retry - any touch triggers retry
 		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
 		if len(touchIDs) > 0 {
 			g.resetGame()
+			g.SoundManager.StartBGM()
 		}
 
 	case StateCleared:

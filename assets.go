@@ -16,3 +16,6 @@ var bgmSoundBytes []byte
 
 //go:embed assets/bakuhatsu.mp3
 var deadSoundBytes []byte
+
+//go:embed assets/clear.mp3
+var clearSoundBytes []byte
