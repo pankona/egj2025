@@ -112,6 +112,7 @@ type Game struct {
 	BlinkCounter    int  // Counter for blinking text animation
 	BlinkVisible    bool // Whether blinking text is currently visible
 	TransitionTimer int  // Timer for screen transitions
+	WhitePixel      *ebiten.Image // Reusable 1x1 white pixel for triangle rendering
 }
 
 // Grid coordinate conversion functions
@@ -589,28 +590,37 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		redCenterY := float32(g.RedUnit.Y) + UnitSize/2
 		vector.DrawFilledCircle(screen, redCenterX, redCenterY, UnitSize/2, g.RedUnit.Color, false)
 
-		// Draw spikes as upward triangles
-		for _, spike := range g.Stage.Spikes {
-			x := float32(spike.X)
-			y := float32(spike.Y)
-			size := float32(CellSize)
+		// Draw spikes as upward triangles (optimized batch rendering)
+		if len(g.Stage.Spikes) > 0 {
+			// Calculate total vertices and indices needed
+			totalSpikes := len(g.Stage.Spikes)
+			vertices := make([]ebiten.Vertex, 0, totalSpikes*3)
+			indices := make([]uint16, 0, totalSpikes*3)
 
-			// Define triangle vertices for upward pointing spike
-			// Bottom left, bottom right, top center
-			vertices := []ebiten.Vertex{
-				{DstX: x, DstY: y + size, SrcX: 0, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},        // Bottom left
-				{DstX: x + size, DstY: y + size, SrcX: 1, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1}, // Bottom right
-				{DstX: x + size/2, DstY: y, SrcX: 0.5, SrcY: 1, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},    // Top center
+			// Build all spike triangles in batch
+			for i, spike := range g.Stage.Spikes {
+				x := float32(spike.X)
+				y := float32(spike.Y)
+				size := float32(CellSize)
+
+				// Define triangle vertices for upward pointing spike
+				baseIndex := uint16(i * 3)
+				spikeVertices := []ebiten.Vertex{
+					{DstX: x, DstY: y + size, SrcX: 0, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},        // Bottom left
+					{DstX: x + size, DstY: y + size, SrcX: 1, SrcY: 0, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1}, // Bottom right
+					{DstX: x + size/2, DstY: y, SrcX: 0.5, SrcY: 1, ColorR: 1, ColorG: 0, ColorB: 0, ColorA: 1},    // Top center
+				}
+
+				// Add vertices to batch
+				vertices = append(vertices, spikeVertices...)
+
+				// Add indices to batch (triangle indices for this spike)
+				spikeIndices := []uint16{baseIndex, baseIndex + 1, baseIndex + 2}
+				indices = append(indices, spikeIndices...)
 			}
 
-			// Triangle indices (counter-clockwise order)
-			indices := []uint16{0, 1, 2}
-
-			// Create a 1x1 white pixel image for drawing solid triangles
-			whiteImage := ebiten.NewImage(1, 1)
-			whiteImage.Fill(color.White)
-
-			screen.DrawTriangles(vertices, indices, whiteImage, nil)
+			// Single DrawTriangles call for all spikes
+			screen.DrawTriangles(vertices, indices, g.WhitePixel, nil)
 		}
 
 		// Draw stage number in top-left corner during gameplay
@@ -774,6 +784,10 @@ func main() {
 	// Get starting positions for the first stage
 	blueX, blueY, redX, redY := stageLoader.GetCurrentStageStartPositions()
 
+	// Create reusable 1x1 white pixel for triangle rendering
+	whitePixel := ebiten.NewImage(1, 1)
+	whitePixel.Fill(color.White)
+
 	game := &Game{
 		BlueUnit: &Unit{
 			X:         blueX,
@@ -803,6 +817,7 @@ func main() {
 		BlinkCounter:    0,
 		BlinkVisible:    true,
 		TransitionTimer: 0,
+		WhitePixel:      whitePixel,
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
