@@ -29,6 +29,8 @@ type SoundManager struct {
 	deadPlayerPool  []*audio.Player // Pool of audio players for dead sound
 	clearSoundBytes []byte          // Store decoded clear sound data for creating new players
 	clearPlayerPool []*audio.Player // Pool of audio players for clear sound
+	shotSoundBytes  []byte          // Store decoded shot sound data for creating new players
+	shotPlayerPool  []*audio.Player // Pool of audio players for shot sound
 	maxConcurrent   int             // Maximum number of concurrent sounds
 	bgmPlayer       *audio.Player   // BGM player for background music (with infinite loop)
 }
@@ -145,6 +147,45 @@ func NewSoundManager() *SoundManager {
 	}
 	clearSoundData := clearBuf.Bytes()
 
+	// Decode shot MP3 file once and store the decoded data
+	shotSoundReader := bytes.NewReader(shotSoundBytes)
+	decodedShotSound, err := mp3.DecodeWithSampleRate(SampleRate, shotSoundReader)
+	if err != nil {
+		log.Printf("Failed to decode shot sound: %v", err)
+		return &SoundManager{
+			audioContext:    audioContext,
+			jumpSoundBytes:  jumpSoundData,
+			jumpPlayerPool:  nil,
+			deadSoundBytes:  deadSoundData,
+			deadPlayerPool:  nil,
+			clearSoundBytes: clearSoundData,
+			clearPlayerPool: nil,
+			shotSoundBytes:  nil,
+			shotPlayerPool:  nil,
+			maxConcurrent:   maxConcurrent,
+		}
+	}
+
+	// Read all decoded shot data into bytes for reuse
+	var shotBuf bytes.Buffer
+	_, err = shotBuf.ReadFrom(decodedShotSound)
+	if err != nil {
+		log.Printf("Failed to read decoded shot sound: %v", err)
+		return &SoundManager{
+			audioContext:    audioContext,
+			jumpSoundBytes:  jumpSoundData,
+			jumpPlayerPool:  nil,
+			deadSoundBytes:  deadSoundData,
+			deadPlayerPool:  nil,
+			clearSoundBytes: clearSoundData,
+			clearPlayerPool: nil,
+			shotSoundBytes:  nil,
+			shotPlayerPool:  nil,
+			maxConcurrent:   maxConcurrent,
+		}
+	}
+	shotSoundData := shotBuf.Bytes()
+
 	// Pre-create a pool of jump players
 	jumpPlayerPool := make([]*audio.Player, 0, maxConcurrent)
 	for i := 0; i < maxConcurrent; i++ {
@@ -176,6 +217,17 @@ func NewSoundManager() *SoundManager {
 			continue
 		}
 		clearPlayerPool = append(clearPlayerPool, player)
+	}
+
+	// Pre-create a pool of shot players
+	shotPlayerPool := make([]*audio.Player, 0, maxConcurrent)
+	for i := 0; i < maxConcurrent; i++ {
+		player, err := audioContext.NewPlayer(bytes.NewReader(shotSoundData))
+		if err != nil {
+			log.Printf("Failed to create shot sound player %d: %v", i, err)
+			continue
+		}
+		shotPlayerPool = append(shotPlayerPool, player)
 	}
 
 	// Initialize BGM player
@@ -259,6 +311,8 @@ func NewSoundManager() *SoundManager {
 		deadPlayerPool:  deadPlayerPool,
 		clearSoundBytes: clearSoundData,
 		clearPlayerPool: clearPlayerPool,
+		shotSoundBytes:  shotSoundData,
+		shotPlayerPool:  shotPlayerPool,
 		maxConcurrent:   maxConcurrent,
 		bgmPlayer:       bgmPlayer,
 	}
@@ -347,4 +401,28 @@ func (sm *SoundManager) StopBGM() {
 	if sm.bgmPlayer != nil && sm.bgmPlayer.IsPlaying() {
 		sm.bgmPlayer.Pause()
 	}
+}
+
+func (sm *SoundManager) PlayShotSound() {
+	if sm.shotSoundBytes == nil {
+		return
+	}
+
+	// Find an available player from the pool
+	for _, player := range sm.shotPlayerPool {
+		if player != nil && !player.IsPlaying() {
+			player.Rewind()
+			player.Play()
+			return
+		}
+	}
+
+	// If all players are busy, create a new temporary player
+	// This ensures we can always play a sound even if the pool is exhausted
+	tempPlayer, err := sm.audioContext.NewPlayer(bytes.NewReader(sm.shotSoundBytes))
+	if err != nil {
+		log.Printf("Failed to create temporary shot sound player: %v", err)
+		return
+	}
+	tempPlayer.Play()
 }

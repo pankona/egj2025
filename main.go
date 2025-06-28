@@ -50,6 +50,7 @@ type GameState int
 
 const (
 	StateTitle GameState = iota
+	StateTitleTransition // Transition state after pressing key on title
 	StatePlaying
 	StateGameOver
 	StateCleared
@@ -101,15 +102,16 @@ type Stage struct {
 }
 
 type Game struct {
-	BlueUnit     *Unit
-	RedUnit      *Unit
-	Stage        *Stage
-	State        GameState
-	Font         *text.GoTextFace
-	StageLoader  *StageLoader
-	SoundManager *SoundManager
-	BlinkCounter int  // Counter for blinking text animation
-	BlinkVisible bool // Whether blinking text is currently visible
+	BlueUnit      *Unit
+	RedUnit       *Unit
+	Stage         *Stage
+	State         GameState
+	Font          *text.GoTextFace
+	StageLoader   *StageLoader
+	SoundManager  *SoundManager
+	BlinkCounter  int  // Counter for blinking text animation
+	BlinkVisible  bool // Whether blinking text is currently visible
+	TransitionTimer int  // Timer for screen transitions
 }
 
 // Grid coordinate conversion functions
@@ -388,6 +390,7 @@ func (g *Game) advanceToNextStageOrRestart() {
 		// No more stages, go to all cleared state
 		g.State = StateAllCleared
 		g.SoundManager.StopBGM()
+		g.SoundManager.PlayClearSound()
 	}
 }
 
@@ -407,16 +410,26 @@ func (g *Game) Update() error {
 	switch g.State {
 	case StateTitle:
 		// Handle any key to start game
-		// Check keyboard input
-		keys := inpututil.AppendPressedKeys(nil)
+		// Check keyboard input - use JustPressedKeys to avoid repeated triggers
+		keys := inpututil.AppendJustPressedKeys(nil)
 		if len(keys) > 0 {
-			g.State = StatePlaying
-			g.SoundManager.StartBGM()
+			g.SoundManager.PlayShotSound()
+			g.State = StateTitleTransition
+			g.TransitionTimer = 60 // 60 frames = 1 second at 60 FPS
 		}
 
 		// Handle touch input
 		touchIDs := inpututil.AppendJustPressedTouchIDs(nil)
 		if len(touchIDs) > 0 {
+			g.SoundManager.PlayShotSound()
+			g.State = StateTitleTransition
+			g.TransitionTimer = 60 // 60 frames = 1 second at 60 FPS
+		}
+
+	case StateTitleTransition:
+		// Count down transition timer
+		g.TransitionTimer--
+		if g.TransitionTimer <= 0 {
 			g.State = StatePlaying
 			g.SoundManager.StartBGM()
 		}
@@ -488,8 +501,8 @@ func (g *Game) Update() error {
 
 	case StateAllCleared:
 		// Handle any key to restart from stage 1
-		// Check keyboard input
-		keys := inpututil.AppendPressedKeys(nil)
+		// Check keyboard input - use JustPressedKeys to avoid repeated triggers
+		keys := inpututil.AppendJustPressedKeys(nil)
 		if len(keys) > 0 {
 			g.StageLoader.ResetToFirstStage()
 			g.resetGame()
@@ -510,7 +523,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
-	case StateTitle:
+	case StateTitle, StateTitleTransition:
 		// TODO: Add background image for title screen
 		// Draw semi-transparent background for now
 		vector.DrawFilledRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{20, 30, 50, 255}, false)
@@ -630,9 +643,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				op2.ColorScale.ScaleWithColor(WhiteColor)
 				text.Draw(screen, "Press SPACE for next stage", g.Font, op2)
 			} else {
-				op2.GeoM.Translate(float64(ScreenWidth/2-120), float64(ScreenHeight/2+10))
+				op2.GeoM.Translate(float64(ScreenWidth/2-110), float64(ScreenHeight/2+10))
 				op2.ColorScale.ScaleWithColor(WhiteColor)
-				text.Draw(screen, "Press SPACE to restart", g.Font, op2)
+				text.Draw(screen, "Press SPACE to continue", g.Font, op2)
 			}
 		}
 	}
@@ -704,6 +717,7 @@ func main() {
 		SoundManager: soundManager,
 		BlinkCounter: 0,
 		BlinkVisible: true,
+		TransitionTimer: 0,
 	}
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

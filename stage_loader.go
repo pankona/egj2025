@@ -14,11 +14,18 @@ func NewStageLoader() *StageLoader {
 	if DebugMode {
 		startStage = 0 // Start from debug stage
 	}
+	// Determine total stages based on debug mode
+	totalStages := 10
+	if DebugMode {
+		// In debug mode, set to 1 for easier testing of all stages cleared screen
+		totalStages = 1
+	}
+	
 	return &StageLoader{
 		CurrentStageIndex: startStage,
 		// NOTE: TotalStages is hardcoded and must be updated manually when adding stages
 		// TODO: Consider dynamic stage counting for better scalability
-		TotalStages: 10,
+		TotalStages: totalStages,
 	}
 }
 

@@ -19,3 +19,6 @@ var deadSoundBytes []byte
 
 //go:embed assets/clear.mp3
 var clearSoundBytes []byte
+
+//go:embed assets/shot.mp3
+var shotSoundBytes []byte
