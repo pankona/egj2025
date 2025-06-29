@@ -56,3 +56,6 @@ stagefix:
 
 clean:
 	rm -rf dist
+
+release:
+	cd dist && zip -r ../union-jumpers-$$(git rev-parse --short HEAD).zip .
