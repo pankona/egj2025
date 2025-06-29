@@ -10,7 +10,7 @@ build-wasm:
 	mkdir -p dist
 	GOOS=js GOARCH=wasm go build -o dist/main.wasm .
 	cp $$(go env GOROOT)/lib/wasm/wasm_exec.js dist/
-	cp web/index.html dist/
+	cp web/* dist/
 
 serve-wasm: build-wasm
 	go run github.com/hajimehoshi/wasmserve@latest -http=:8080 .
