@@ -8,8 +8,8 @@ Created for [Ebitengine Game Jam 2025](https://itch.io/jam/ebitengine-game-jam-2
 
 ## 🎮 Play Online
 
-[Play UNION JUMPERS! on GitHub Pages](https://pankona.github.io/egj2025/)
-[Play UNION JUMPERS! on itch.io](https://pankona.itch.io/union-jumpers)
+- [Play UNION JUMPERS! on GitHub Pages](https://pankona.github.io/egj2025/)
+- [Play UNION JUMPERS! on itch.io](https://pankona.itch.io/union-jumpers)
 
 ## 📖 About the Game
 
