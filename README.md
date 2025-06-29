@@ -1,4 +1,4 @@
-# UNION JUMPERS
+# UNION JUMPERS!
 
 A two-handed puzzle action game where you control two characters simultaneously with your left and right hands.
 
