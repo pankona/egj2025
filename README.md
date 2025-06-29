@@ -1,16 +1,19 @@
 # UNION JUMPERS!
 
+![union-jumper-cover-fotor-20250629155916](https://github.com/user-attachments/assets/bcc93d06-1d9f-40c0-8176-fb07c5e250c0)
+
 A two-handed puzzle action game where you control two characters simultaneously with your left and right hands.
 
 Created for [Ebitengine Game Jam 2025](https://itch.io/jam/ebitengine-game-jam-2025).
 
 ## 🎮 Play Online
 
-[Play UNION JUMPERS on GitHub Pages](https://pankona.github.io/egj2025/)
+[Play UNION JUMPERS! on GitHub Pages](https://pankona.github.io/egj2025/)
+[Play UNION JUMPERS! on itch.io](https://pankona.itch.io/union-jumpers)
 
 ## 📖 About the Game
 
-UNION JUMPERS is a cooperative puzzle platformer where players must guide two characters (blue and red) to the goal simultaneously. The unique twist is that each character is controlled by a different hand - creating a challenging coordination experience.
+UNION JUMPERS! is a cooperative puzzle platformer where players must guide two characters (blue and red) to the goal simultaneously. The unique twist is that each character is controlled by a different hand - creating a challenging coordination experience.
 
 ### Features
 
