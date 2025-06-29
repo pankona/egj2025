@@ -15,17 +15,44 @@ func LoadStage0() *Stage {
 			// Regular platform at (39, 1) size 1x30
 			CreateGridPlatform(39, 1, 1, 30),
 
-			// Regular platform at (23, 6) size 17x1
-			CreateGridPlatform(23, 6, 17, 1),
+			// Regular platform at (5, 6) size 7x1
+			CreateGridPlatform(5, 6, 7, 1),
 
-			// Regular platform at (5, 11) size 4x2
-			CreateGridPlatform(5, 11, 4, 2),
+			// Regular platform at (22, 6) size 9x1
+			CreateGridPlatform(22, 6, 9, 1),
 
-			// Regular platform at (30, 11) size 1x2
-			CreateGridPlatform(30, 11, 1, 2),
+			// Regular platform at (4, 7) size 1x1
+			CreateGridPlatform(4, 7, 1, 1),
 
-			// Regular platform at (11, 12) size 20x1
-			CreateGridPlatform(11, 12, 20, 1),
+			// Regular platform at (12, 7) size 3x1
+			CreateGridPlatform(12, 7, 3, 1),
+
+			// Regular platform at (15, 8) size 3x1
+			CreateGridPlatform(15, 8, 3, 1),
+
+			// Regular platform at (38, 8) size 2x1
+			CreateGridPlatform(38, 8, 2, 1),
+
+			// Regular platform at (18, 9) size 3x1
+			CreateGridPlatform(18, 9, 3, 1),
+
+			// Regular platform at (37, 9) size 1x1
+			CreateGridPlatform(37, 9, 1, 1),
+
+			// Regular platform at (36, 10) size 1x1
+			CreateGridPlatform(36, 10, 1, 1),
+
+			// Regular platform at (21, 11) size 6x2
+			CreateGridPlatform(21, 11, 6, 2),
+
+			// Regular platform at (29, 11) size 1x2
+			CreateGridPlatform(29, 11, 1, 2),
+
+			// Regular platform at (34, 11) size 2x2
+			CreateGridPlatform(34, 11, 2, 2),
+
+			// Regular platform at (30, 12) size 6x1
+			CreateGridPlatform(30, 12, 6, 1),
 
 			// Regular platform at (1, 13) size 1x1
 			CreateGridPlatform(1, 13, 1, 1),
@@ -39,14 +66,14 @@ func LoadStage0() *Stage {
 			// Regular platform at (4, 16) size 1x1
 			CreateGridPlatform(4, 16, 1, 1),
 
-			// Regular platform at (5, 17) size 2x2
-			CreateGridPlatform(5, 17, 2, 2),
+			// Regular platform at (5, 17) size 8x2
+			CreateGridPlatform(5, 17, 8, 2),
 
-			// Regular platform at (12, 17) size 1x2
-			CreateGridPlatform(12, 17, 1, 2),
+			// Regular platform at (15, 17) size 1x2
+			CreateGridPlatform(15, 17, 1, 2),
 
-			// Regular platform at (15, 17) size 7x2
-			CreateGridPlatform(15, 17, 7, 2),
+			// Regular platform at (21, 17) size 1x2
+			CreateGridPlatform(21, 17, 1, 2),
 
 			// Regular platform at (24, 17) size 1x2
 			CreateGridPlatform(24, 17, 1, 2),
@@ -54,41 +81,59 @@ func LoadStage0() *Stage {
 			// Regular platform at (27, 17) size 1x2
 			CreateGridPlatform(27, 17, 1, 2),
 
-			// Regular platform at (30, 17) size 1x2
-			CreateGridPlatform(30, 17, 1, 2),
+			// Regular platform at (30, 17) size 3x2
+			CreateGridPlatform(30, 17, 3, 2),
 
-			// Regular platform at (34, 17) size 1x1
-			CreateGridPlatform(34, 17, 1, 1),
-
-			// Regular platform at (7, 18) size 6x1
-			CreateGridPlatform(7, 18, 6, 1),
+			// Regular platform at (16, 18) size 6x1
+			CreateGridPlatform(16, 18, 6, 1),
 
 			// Regular platform at (25, 18) size 3x1
 			CreateGridPlatform(25, 18, 3, 1),
 
-			// Regular platform at (31, 18) size 3x1
-			CreateGridPlatform(31, 18, 3, 1),
+			// Regular platform at (33, 18) size 1x1
+			CreateGridPlatform(33, 18, 1, 1),
 
-			// Regular platform at (37, 18) size 3x3
-			CreateGridPlatform(37, 18, 3, 3),
+			// Regular platform at (37, 18) size 3x1
+			CreateGridPlatform(37, 18, 3, 1),
 
-			// Regular platform at (13, 22) size 1x3
-			CreateGridPlatform(13, 22, 1, 3),
+			// Regular platform at (38, 21) size 2x4
+			CreateGridPlatform(38, 21, 2, 4),
 
-			// Regular platform at (26, 22) size 1x3
-			CreateGridPlatform(26, 22, 1, 3),
+			// Regular platform at (37, 22) size 3x3
+			CreateGridPlatform(37, 22, 3, 3),
 
 			// Regular platform at (5, 23) size 2x2
 			CreateGridPlatform(5, 23, 2, 2),
 
-			// Regular platform at (9, 23) size 11x2
-			CreateGridPlatform(9, 23, 11, 2),
+			// Regular platform at (9, 23) size 1x2
+			CreateGridPlatform(9, 23, 1, 2),
 
-			// Regular platform at (22, 23) size 15x2
-			CreateGridPlatform(22, 23, 15, 2),
+			// Regular platform at (13, 23) size 7x2
+			CreateGridPlatform(13, 23, 7, 2),
 
-			// Regular platform at (1, 29) size 5x2
-			CreateGridPlatform(1, 29, 5, 2),
+			// Regular platform at (22, 23) size 4x2
+			CreateGridPlatform(22, 23, 4, 2),
+
+			// Regular platform at (28, 23) size 1x2
+			CreateGridPlatform(28, 23, 1, 2),
+
+			// Regular platform at (36, 23) size 4x2
+			CreateGridPlatform(36, 23, 4, 2),
+
+			// Regular platform at (10, 24) size 10x1
+			CreateGridPlatform(10, 24, 10, 1),
+
+			// Regular platform at (29, 24) size 11x1
+			CreateGridPlatform(29, 24, 11, 1),
+
+			// Regular platform at (1, 27) size 1x4
+			CreateGridPlatform(1, 27, 1, 4),
+
+			// Regular platform at (2, 28) size 1x3
+			CreateGridPlatform(2, 28, 1, 3),
+
+			// Regular platform at (3, 29) size 3x2
+			CreateGridPlatform(3, 29, 3, 2),
 
 			// Regular platform at (8, 29) size 1x2
 			CreateGridPlatform(8, 29, 1, 2),
@@ -129,17 +174,14 @@ func LoadStage0() *Stage {
 			// Goal platform at (37, 27) size 2x2
 			CreateGridGoalPlatform(37, 27, 2, 2),
 
-			// Speed-up platform at (23, 5) size 16x1
-			CreateGridSpeedUpPlatform(23, 5, 16, 1),
+			// Speed-up platform at (22, 5) size 9x1
+			CreateGridSpeedUpPlatform(22, 5, 9, 1),
 
-			// Speed-up platform at (11, 11) size 19x1
-			CreateGridSpeedUpPlatform(11, 11, 19, 1),
+			// Speed-up platform at (30, 11) size 4x1
+			CreateGridSpeedUpPlatform(30, 11, 4, 1),
 
-			// Speed-up platform at (25, 17) size 2x1
-			CreateGridSpeedUpPlatform(25, 17, 2, 1),
-
-			// Speed-up platform at (31, 17) size 3x1
-			CreateGridSpeedUpPlatform(31, 17, 3, 1),
+			// Speed-up platform at (29, 23) size 7x1
+			CreateGridSpeedUpPlatform(29, 23, 7, 1),
 
 			// Speed-up platform at (9, 29) size 4x1
 			CreateGridSpeedUpPlatform(9, 29, 4, 1),
@@ -153,16 +195,34 @@ func LoadStage0() *Stage {
 			// Speed-up platform at (33, 29) size 4x1
 			CreateGridSpeedUpPlatform(33, 29, 4, 1),
 
-			// Speed-down platform at (7, 17) size 5x1
-			CreateGridSpeedDownPlatform(7, 17, 5, 1),
+			// Speed-down platform at (16, 17) size 5x1
+			CreateGridSpeedDownPlatform(16, 17, 5, 1),
+
+			// Speed-down platform at (25, 17) size 2x1
+			CreateGridSpeedDownPlatform(25, 17, 2, 1),
+
+			// Speed-down platform at (10, 23) size 3x1
+			CreateGridSpeedDownPlatform(10, 23, 3, 1),
 		},
 		Spikes: []Spike{
 
-			// Spike at (9, 12)
-			CreateGridSpike(9, 12),
+			// Spike at (17, 12)
+			CreateGridSpike(17, 12),
 
-			// Spike at (10, 12)
-			CreateGridSpike(10, 12),
+			// Spike at (18, 12)
+			CreateGridSpike(18, 12),
+
+			// Spike at (19, 12)
+			CreateGridSpike(19, 12),
+
+			// Spike at (20, 12)
+			CreateGridSpike(20, 12),
+
+			// Spike at (27, 12)
+			CreateGridSpike(27, 12),
+
+			// Spike at (28, 12)
+			CreateGridSpike(28, 12),
 
 			// Spike at (37, 17)
 			CreateGridSpike(37, 17),
@@ -200,11 +260,11 @@ func LoadStage0() *Stage {
 			// Spike at (21, 24)
 			CreateGridSpike(21, 24),
 
-			// Spike at (37, 24)
-			CreateGridSpike(37, 24),
+			// Spike at (26, 24)
+			CreateGridSpike(26, 24),
 
-			// Spike at (38, 24)
-			CreateGridSpike(38, 24),
+			// Spike at (27, 24)
+			CreateGridSpike(27, 24),
 
 			// Spike at (6, 30)
 			CreateGridSpike(6, 30),
@@ -236,5 +296,5 @@ func LoadStage0() *Stage {
 // GetStage0StartPositions returns the starting positions for stage 0
 func GetStage0StartPositions() (blueX, blueY, redX, redY float64) {
 	// Convert grid coordinates to pixel coordinates
-	return 760, 80, 620, 80
+	return 500, 80, 580, 80
 }
